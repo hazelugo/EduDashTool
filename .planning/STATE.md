@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: planning
+stopped_at: "Completed 01-foundation-and-schema plan 01-01: Playwright E2E infrastructure"
+last_updated: "2026-03-15T21:25:59.613Z"
+last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
+progress:
+  total_phases: 7
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 3
+  percent: 40
+---
+
 # Project State
 
 ## Project Reference
@@ -14,7 +30,7 @@ Plan: 0 of TBD in current phase
 Status: Ready to plan
 Last activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -34,6 +50,9 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-foundation-and-schema P03 | 1 | 2 tasks | 3 files |
+| Phase 01-foundation-and-schema P01 | 1 | 2 tasks | 2 files |
+| Phase 01-foundation-and-schema P02 | 2 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -45,6 +64,12 @@ Recent decisions affecting current work:
 - [Pre-work]: Manual data entry for v1 — SIS sync deferred; keeps scope tight for pilot school
 - [Pre-work]: Gemini as AI engine — explicitly chosen; server-side only via Server Actions
 - [Pre-work]: Role-based access via Supabase + application-layer query scoping — RLS alone does NOT protect Drizzle's direct Postgres connection; every query must include explicit role WHERE clauses
+- [Phase 01-foundation-and-schema]: GraduationCap chosen as login page icon — education-appropriate replacement for Music icon
+- [Phase 01-foundation-and-schema]: Nav items reduced from 5 music routes to 2 EduDash routes (Dashboard, Students)
+- [Phase 01-foundation-and-schema]: Single chromium project for Phase 1 E2E — sufficient for verification, avoids cross-browser complexity
+- [Phase 01-foundation-and-schema]: No fullyParallel in Playwright — tests share login state and must run sequentially within file
+- [Phase 01-foundation-and-schema]: webServer.timeout 120s for Playwright — accommodates Next.js cold start exceeding default 60s
+- [Phase 01-foundation-and-schema]: Edge Runtime cannot throw at module level — proxy.ts uses inline 503 guard; browser/server clients use module-level throw with [EduDash] prefix
 
 ### Pending Todos
 
@@ -58,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15
-Stopped at: Roadmap created and written to .planning/ROADMAP.md
+Last session: 2026-03-15T21:25:45.298Z
+Stopped at: Completed 01-foundation-and-schema plan 01-01: Playwright E2E infrastructure
 Resume file: None

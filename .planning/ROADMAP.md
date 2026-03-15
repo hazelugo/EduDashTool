@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Schema | 0/TBD | Not started | - |
+| 1. Foundation and Schema | 3/5 | In Progress|  |
 | 2. Role System and Staff Profiles | 0/TBD | Not started | - |
 | 3. Student List and Search | 0/TBD | Not started | - |
 | 4. Student Profile — Read | 0/TBD | Not started | - |
