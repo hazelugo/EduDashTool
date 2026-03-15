@@ -8,7 +8,8 @@
       "Bash(node:*)",
       "Bash(git add:*)",
       "Bash(gemini:*)",
-      "Bash(claude mcp:*)"
+      "Bash(claude mcp:*)",
+      "mcp__gemini-cli__ask-gemini"
     ]
   }
 }
