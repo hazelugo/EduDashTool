@@ -8,17 +8,14 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Music, Search, ListMusic, Moon, Sun, Timer, Piano, LogOut } from "lucide-react"
+import { LayoutDashboard, Users, Moon, Sun, LogOut } from "lucide-react"
 import { useTheme } from "next-themes"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 const navItems = [
-  { title: "Songs",      url: "/songs",     icon: Music },
-  { title: "Discovery",  url: "/discovery", icon: Search },
-  { title: "Playlists",  url: "/playlists", icon: ListMusic },
-  { title: "Metronome",  url: "/metronome", icon: Timer },
-  { title: "Chord Pads", url: "/chords",    icon: Piano },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Students",  url: "/students",  icon: Users },
 ]
 
 export function AppSidebar() {
@@ -43,7 +40,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <span className="font-semibold px-2 py-1 text-base">Song Tool</span>
+        <span className="font-semibold px-2 py-1 text-base">EduDash</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
