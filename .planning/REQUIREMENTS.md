@@ -9,8 +9,8 @@
 
 - [x] **FOUND-01**: Existing post-login redirect to `/songs` is fixed to redirect to `/dashboard`
 - [x] **FOUND-02**: Supabase environment variable validation runs at startup and fails fast with a clear error if missing
-- [ ] **FOUND-03**: Database migrations run via `db:migrate` script only, not inside the Next.js build step
-- [ ] **FOUND-04**: All 10 database tables are defined, migrated, and have Row Level Security enabled
+- [x] **FOUND-03**: Database migrations run via `db:migrate` script only, not inside the Next.js build step
+- [x] **FOUND-04**: All 10 database tables are defined, migrated, and have Row Level Security enabled
 - [x] **FOUND-05**: App is fully rebranded from "Song Tool" to "EduDash" (title, sidebar, metadata, all copy)
 
 ### Authentication & Roles
@@ -107,8 +107,8 @@
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
 | FOUND-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 2 | Pending |

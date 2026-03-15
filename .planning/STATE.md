@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-foundation-and-schema/01-02-PLAN.md
-last_updated: "2026-03-15T21:26:02.616Z"
+stopped_at: Completed 01-foundation-and-schema/01-04-PLAN.md
+last_updated: "2026-03-15T21:39:14.435Z"
 last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 40
 ---
 
@@ -53,6 +53,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01-foundation-and-schema P03 | 1 | 2 tasks | 3 files |
 | Phase 01-foundation-and-schema P01 | 1 | 2 tasks | 2 files |
 | Phase 01-foundation-and-schema P02 | 2 | 2 tasks | 6 files |
+| Phase 01-foundation-and-schema P04 | 4 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation-and-schema]: webServer.timeout 120s for Playwright — accommodates Next.js cold start exceeding default 60s
 - [Phase 01-foundation-and-schema]: Edge Runtime cannot throw at module level — proxy.ts uses inline 503 guard; browser/server clients use module-level throw with [EduDash] prefix
 - [Phase 01-foundation-and-schema]: npm run build = next build only; db:migrate is an explicit developer action via npm run db:migrate
+- [Phase 01-foundation-and-schema]: staff_profiles.id has NO defaultRandom() — must match auth.users.id for RLS auth.uid() compatibility
+- [Phase 01-foundation-and-schema]: All 10 schema tables use array-form indexes (t) => [...] per Drizzle 0.45.1; uniqueIndex enforces 1:1 on graduation_plans and college_prep_plans
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T21:26:02.613Z
-Stopped at: Completed 01-foundation-and-schema/01-02-PLAN.md
+Last session: 2026-03-15T21:39:14.431Z
+Stopped at: Completed 01-foundation-and-schema/01-04-PLAN.md
 Resume file: None
