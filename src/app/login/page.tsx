@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Music } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 type Mode = "signin" | "signup";
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
           setError(error.message);
           return;
         }
-        router.push("/songs");
+        router.push("/dashboard");
         router.refresh();
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
@@ -58,11 +58,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Music className="size-6 text-primary" />
+            <GraduationCap className="size-6 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">Song Tool</h1>
+          <h1 className="text-2xl font-bold">EduDash</h1>
           <p className="text-sm text-muted-foreground">
-            Your personal music library
+            Student data dashboard for educators
           </p>
         </div>
 
