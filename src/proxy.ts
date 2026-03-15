@@ -3,11 +3,21 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json(
+      { error: "Server misconfiguration: Supabase environment variables are not set." },
+      { status: 503 }
+    );
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
@@ -39,9 +49,9 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && isLoginPage) {
-    const songsUrl = request.nextUrl.clone();
-    songsUrl.pathname = "/songs";
-    return NextResponse.redirect(songsUrl);
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/dashboard";
+    return NextResponse.redirect(dashboardUrl);
   }
 
   return response;
