@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: "Completed 01-foundation-and-schema plan 01-01: Playwright E2E infrastructure"
-last_updated: "2026-03-15T21:25:59.613Z"
+stopped_at: Completed 01-foundation-and-schema/01-02-PLAN.md
+last_updated: "2026-03-15T21:26:02.616Z"
 last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
 progress:
   total_phases: 7
@@ -70,6 +70,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundation-and-schema]: No fullyParallel in Playwright — tests share login state and must run sequentially within file
 - [Phase 01-foundation-and-schema]: webServer.timeout 120s for Playwright — accommodates Next.js cold start exceeding default 60s
 - [Phase 01-foundation-and-schema]: Edge Runtime cannot throw at module level — proxy.ts uses inline 503 guard; browser/server clients use module-level throw with [EduDash] prefix
+- [Phase 01-foundation-and-schema]: npm run build = next build only; db:migrate is an explicit developer action via npm run db:migrate
 
 ### Pending Todos
 
@@ -83,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T21:25:45.298Z
-Stopped at: Completed 01-foundation-and-schema plan 01-01: Playwright E2E infrastructure
+Last session: 2026-03-15T21:26:02.613Z
+Stopped at: Completed 01-foundation-and-schema/01-02-PLAN.md
 Resume file: None
