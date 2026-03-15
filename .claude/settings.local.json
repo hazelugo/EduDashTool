@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(gsd:new-project)",
+      "Skill(gsd:map-codebase)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(gemini:*)",
+      "Bash(claude mcp:*)"
+    ]
+  }
+}
