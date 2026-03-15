@@ -1,0 +1,17 @@
+{
+  "mode": "yolo",
+  "granularity": "coarse",
+  "parallelization": true,
+  "commit_docs": true,
+  "model_profile": "balanced",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true,
+    "nyquist_validation": true,
+    "auto_advance": false
+  },
+  "notes": {
+    "ai_engine": "Google Gemini (@google/generative-ai) is the AI backbone for the EduDash application — powers student insights, roadmap generation, and at-risk monitoring. GSD workflow agents use Claude Sonnet internally."
+  }
+}
