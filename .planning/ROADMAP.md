@@ -12,7 +12,7 @@ EduDash is built from a working Next.js 16 shell (currently "Song Tool") that ha
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and Schema** - Fix three live blockers and define all 10 database tables
+- [x] **Phase 1: Foundation and Schema** - Fix three live blockers and define all 10 database tables (completed 2026-03-15)
 - [ ] **Phase 2: Role System and Staff Profiles** - Wire staff roles to auth and enforce role-scoped data access
 - [ ] **Phase 3: Student List and Search** - Paginated, searchable, role-scoped student list
 - [ ] **Phase 4: Student Profile — Read** - Unified student profile page displaying all aggregated data
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Schema | 4/5 | In Progress|  |
+| 1. Foundation and Schema | 5/5 | Complete   | 2026-03-15 |
 | 2. Role System and Staff Profiles | 0/TBD | Not started | - |
 | 3. Student List and Search | 0/TBD | Not started | - |
 | 4. Student Profile — Read | 0/TBD | Not started | - |
