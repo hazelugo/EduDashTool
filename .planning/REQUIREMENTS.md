@@ -7,15 +7,15 @@
 
 ### Foundation
 
-- [ ] **FOUND-01**: Existing post-login redirect to `/songs` is fixed to redirect to `/dashboard`
-- [ ] **FOUND-02**: Supabase environment variable validation runs at startup and fails fast with a clear error if missing
+- [x] **FOUND-01**: Existing post-login redirect to `/songs` is fixed to redirect to `/dashboard`
+- [x] **FOUND-02**: Supabase environment variable validation runs at startup and fails fast with a clear error if missing
 - [ ] **FOUND-03**: Database migrations run via `db:migrate` script only, not inside the Next.js build step
 - [ ] **FOUND-04**: All 10 database tables are defined, migrated, and have Row Level Security enabled
-- [ ] **FOUND-05**: App is fully rebranded from "Song Tool" to "EduDash" (title, sidebar, metadata, all copy)
+- [x] **FOUND-05**: App is fully rebranded from "Song Tool" to "EduDash" (title, sidebar, metadata, all copy)
 
 ### Authentication & Roles
 
-- [ ] **AUTH-01**: Staff member can log in with email and password and be redirected to the dashboard
+- [x] **AUTH-01**: Staff member can log in with email and password and be redirected to the dashboard
 - [ ] **AUTH-02**: Staff member's role (teacher, counselor, principal) is stored in a `staff_profiles` table linked to their auth user
 - [ ] **AUTH-03**: Teacher can only view students enrolled in classes they are assigned to teach
 - [ ] **AUTH-04**: Counselor can view all students school-wide
@@ -105,12 +105,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Pending |
 | FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
-| AUTH-01 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Complete |
+| AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
 | AUTH-04 | Phase 2 | Pending |
