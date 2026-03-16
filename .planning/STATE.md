@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: planning
 stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-16T09:35:04.141Z"
+last_updated: "2026-03-16T09:39:14.651Z"
 last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 40
 ---
 
@@ -84,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 02-role-system-and-staff-profiles]: Non-null assertion on supabase URL/key in client/server helpers — runtime throw guards above ensure values exist; TypeScript narrowing does not carry across module-level variable assignments
 - [Phase 02-role-system-and-staff-profiles]: requireStaffProfile() uses redirect() from next/navigation for SC/SA; requireUser() retained for API route handlers using NextResponse
 - [Phase 02-role-system-and-staff-profiles]: vitest installed with loadEnv config to pick up .env.local — required since supabase/server.ts throws at module level without NEXT_PUBLIC_SUPABASE_URL
+- [Phase 02-role-system-and-staff-profiles]: roleLabel mapping defined inside component function body — co-located with usage for clarity
+- [Phase 02-role-system-and-staff-profiles]: Audit log page uses simple leftJoin query (no CTE) — simpler and sufficient for 200-entry limit
 
 ### Pending Todos
 
