@@ -16,11 +16,11 @@
 ### Authentication & Roles
 
 - [x] **AUTH-01**: Staff member can log in with email and password and be redirected to the dashboard
-- [ ] **AUTH-02**: Staff member's role (teacher, counselor, principal) is stored in a `staff_profiles` table linked to their auth user
-- [ ] **AUTH-03**: Teacher can only view students enrolled in classes they are assigned to teach
-- [ ] **AUTH-04**: Counselor can view all students school-wide
-- [ ] **AUTH-05**: Principal can view all students school-wide
-- [ ] **AUTH-06**: Every student profile page view is recorded in a FERPA-compliant access audit log (who viewed which student, when)
+- [x] **AUTH-02**: Staff member's role (teacher, counselor, principal) is stored in a `staff_profiles` table linked to their auth user
+- [x] **AUTH-03**: Teacher can only view students enrolled in classes they are assigned to teach
+- [x] **AUTH-04**: Counselor can view all students school-wide
+- [x] **AUTH-05**: Principal can view all students school-wide
+- [x] **AUTH-06**: Every student profile page view is recorded in a FERPA-compliant access audit log (who viewed which student, when)
 
 ### Student List
 
@@ -111,11 +111,11 @@
 | FOUND-04 | Phase 1 | Complete |
 | FOUND-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
-| AUTH-04 | Phase 2 | Pending |
-| AUTH-05 | Phase 2 | Pending |
-| AUTH-06 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
+| AUTH-04 | Phase 2 | Complete |
+| AUTH-05 | Phase 2 | Complete |
+| AUTH-06 | Phase 2 | Complete |
 | LIST-01 | Phase 3 | Pending |
 | LIST-02 | Phase 3 | Pending |
 | LIST-03 | Phase 3 | Pending |

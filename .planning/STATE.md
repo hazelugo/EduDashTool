@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-16T08:56:56.532Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-16T09:35:04.141Z"
 last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 7
   percent: 40
 ---
 
@@ -55,6 +55,8 @@ Progress: [████░░░░░░] 40%
 | Phase 01-foundation-and-schema P02 | 2 | 2 tasks | 6 files |
 | Phase 01-foundation-and-schema P04 | 4 | 1 tasks | 1 files |
 | Phase 01-foundation-and-schema P05 | 8 | 2 tasks | 6 files |
+| Phase 02-role-system-and-staff-profiles P02 | 12 | 2 tasks | 5 files |
+| Phase 02-role-system-and-staff-profiles P01 | 25 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -77,6 +79,11 @@ Recent decisions affecting current work:
 - [Phase 01-foundation-and-schema]: All 10 schema tables use array-form indexes (t) => [...] per Drizzle 0.45.1; uniqueIndex enforces 1:1 on graduation_plans and college_prep_plans
 - [Phase 01-foundation-and-schema]: Migration applied manually via Supabase SQL Editor — direct DB host is IPv6-only, unreachable from dev machine
 - [Phase 01-foundation-and-schema]: deny_all_anon RLS policy as Phase 1 baseline on all 10 tables; Phase 2 adds role-scoped authenticated SELECT policies
+- [Phase 02-role-system-and-staff-profiles]: Session-only check in middleware — no staff_profiles DB lookup; requireStaffProfile() handles the no-profile case inside server components
+- [Phase 02-role-system-and-staff-profiles]: All RLS policies on students table include explicit role checks in USING clause — prevents OR-semantics leakage where teachers could match the counselor/principal unrestricted policy
+- [Phase 02-role-system-and-staff-profiles]: Non-null assertion on supabase URL/key in client/server helpers — runtime throw guards above ensure values exist; TypeScript narrowing does not carry across module-level variable assignments
+- [Phase 02-role-system-and-staff-profiles]: requireStaffProfile() uses redirect() from next/navigation for SC/SA; requireUser() retained for API route handlers using NextResponse
+- [Phase 02-role-system-and-staff-profiles]: vitest installed with loadEnv config to pick up .env.local — required since supabase/server.ts throws at module level without NEXT_PUBLIC_SUPABASE_URL
 
 ### Pending Todos
 
@@ -90,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T08:56:56.529Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-role-system-and-staff-profiles/02-CONTEXT.md
+Last session: 2026-03-16T09:35:04.138Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
