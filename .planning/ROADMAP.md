@@ -12,7 +12,7 @@ EduDash is built from a working Next.js 16 shell (currently "Song Tool") that ha
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Foundation and Schema** - Fix three live blockers and define all 10 database tables (completed 2026-03-15)
+- [x] **Phase 1: Foundation and Schema** - Fix three live blockers and define all 10 database tables (completed 2026-03-15)
 - [ ] **Phase 2: Role System and Staff Profiles** - Wire staff roles to auth and enforce role-scoped data access
 - [ ] **Phase 3: Student List and Search** - Paginated, searchable, role-scoped student list
 - [ ] **Phase 4: Student Profile — Read** - Unified student profile page displaying all aggregated data
@@ -43,7 +43,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A server action called with a teacher's session cannot retrieve students from outside that teacher's assigned classes — role scoping is enforced at the query layer, not just the UI
   3. Counselor and principal sessions can retrieve any student in the school without restriction
   4. Every student profile page view is recorded in the access audit log with the viewer's ID, student ID, and timestamp
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Wave 0 tests + accessAuditLog schema + requireStaffProfile() + logAuditEntry()
+- [ ] 02-02-PLAN.md — Middleware + /no-access page + supabase/rls-phase2.sql
+- [ ] 02-03-PLAN.md — Sidebar name+role badge + /dashboard/audit-log principal page
 
 ### Phase 3: Student List and Search
 **Goal**: Any logged-in staff member can open the student list, find students by name or filter, and see only students their role permits
@@ -112,7 +117,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Schema | 5/5 | Complete   | 2026-03-15 |
-| 2. Role System and Staff Profiles | 0/TBD | Not started | - |
+| 2. Role System and Staff Profiles | 0/3 | Not started | - |
 | 3. Student List and Search | 0/TBD | Not started | - |
 | 4. Student Profile — Read | 0/TBD | Not started | - |
 | 5. Data Entry — Write | 0/TBD | Not started | - |
