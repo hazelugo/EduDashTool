@@ -9,7 +9,13 @@
       "Bash(git add:*)",
       "Bash(gemini:*)",
       "Bash(claude mcp:*)",
-      "mcp__gemini-cli__ask-gemini"
+      "mcp__gemini-cli__ask-gemini",
+      "Bash(cd:*)",
+      "Bash(nslookup:*)",
+      "Bash(npm run:*)",
+      "Bash(echo:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres.idzfkdvwriloujgrmoky:Emma0813Emma08@aws-0-us-west-2.pooler.supabase.com:5432/postgres\" npx tsx -e \"import postgres from 'postgres'; const sql = postgres\\(process.env.DATABASE_URL!, {prepare:false}\\); sql\\\\`SELECT 1 as ok\\\\`.then\\(r => { console.log\\('ok:', r\\); process.exit\\(0\\); }\\).catch\\(e => { console.error\\('fail:', e.message\\); process.exit\\(1\\); }\\);\" 2>&1)",
+      "Bash(npx tsx:*)"
     ]
   }
 }
