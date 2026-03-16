@@ -7,6 +7,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { LayoutDashboard, Users, Moon, Sun, LogOut } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -22,19 +23,31 @@ export function AppSidebar() {
   const { theme, setTheme } = useTheme()
   const { setOpenMobile } = useSidebar()
   const router = useRouter()
-  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [profile, setProfile] = useState<{ fullName: string | null; role: string } | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserEmail(user?.email ?? null)
-    })
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("staff_profiles")
+        .select("full_name, role")
+        .eq("id", user.id)
+        .single();
+      if (data) setProfile({ fullName: data.full_name, role: data.role });
+    });
   }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
     router.refresh()
+  }
+
+  const roleLabel: Record<string, string> = {
+    teacher: "Teacher",
+    counselor: "Counselor",
+    principal: "Principal",
   }
 
   return (
@@ -59,10 +72,15 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="gap-1">
-        {userEmail && (
-          <p className="px-2 py-1 text-xs text-muted-foreground truncate">
-            {userEmail}
-          </p>
+        {profile && (
+          <div className="px-2 py-1 flex items-center gap-2">
+            <p className="text-xs text-muted-foreground truncate flex-1">
+              {profile.fullName ?? "Staff Member"}
+            </p>
+            <Badge variant="secondary" className="text-xs shrink-0">
+              {roleLabel[profile.role] ?? profile.role}
+            </Badge>
+          </div>
         )}
         <Button
           variant="ghost"
