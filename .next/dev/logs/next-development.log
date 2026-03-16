@@ -1,3 +1,7 @@
-[00:00:02.142] Server  LOG     ✓ Ready in 1603ms
-[00:00:25.686] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:07.825] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:02.847] Server  LOG     ✓ Ready in 2s
+[00:00:57.232] Server  ERROR   ⨯ Error: The default export is not a React Component in "/page"
+[00:00:57.455] Server  ERROR   ⨯ Error: The default export is not a React Component in "/page"
+[00:00:59.152] Browser ERROR   uncaughtError: Error: The default export is not a React Component in "/page"
+[00:05:01.198] Server  LOG     ✓ Compiled in 387ms
+[00:05:55.836] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:00.386] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
