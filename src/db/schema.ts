@@ -289,3 +289,28 @@ export const aiInsights = pgTable(
     index("ai_insights_student_current_idx").on(t.studentId, t.isCurrent),
   ]
 );
+
+// ─── Table 11: access_audit_log ──────────────────────────────────────────────
+// FERPA-compliant audit log: records every student profile view
+// Write-only for all staff except principals; no defaultNow on viewer_id/student_id
+
+export const accessAuditLog = pgTable(
+  "access_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    viewerId: uuid("viewer_id")
+      .notNull()
+      .references(() => staffProfiles.id),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("access_audit_log_viewer_idx").on(t.viewerId),
+    index("access_audit_log_student_idx").on(t.studentId),
+    index("access_audit_log_viewed_at_idx").on(t.viewedAt),
+  ]
+);
