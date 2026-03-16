@@ -2,6 +2,7 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/api/health/route": "/api/health",
+  "/dashboard/audit-log/page": "/dashboard/audit-log",
   "/dashboard/page": "/dashboard",
   "/login/page": "/login",
   "/no-access/page": "/no-access",

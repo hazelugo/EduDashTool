@@ -53,6 +53,12 @@
       "namedRegex": "^/dashboard(?:/)?$"
     },
     {
+      "page": "/dashboard/audit-log",
+      "regex": "^/dashboard/audit\\-log(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/audit\\-log(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},
