@@ -15,5 +15,5 @@ if (!supabaseKey) {
 }
 
 export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseKey);
+  return createBrowserClient(supabaseUrl!, supabaseKey!);
 }

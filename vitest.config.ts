@@ -1,16 +1,20 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, loadEnv } from "vitest/config";
 import path from "path";
 
-export default defineConfig({
-  test: {
-    environment: "node",
-    globals: true,
-    include: ["src/__tests__/**/*.test.ts"],
-    exclude: ["tests/**", "node_modules/**"],
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
+    test: {
+      environment: "node",
+      globals: true,
+      include: ["src/__tests__/**/*.test.ts"],
+      exclude: ["tests/**", "node_modules/**"],
+      env,
     },
-  },
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
+  };
 });
