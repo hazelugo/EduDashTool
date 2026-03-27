@@ -125,22 +125,17 @@ export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
 export async function getSchoolStats(atRiskCount: number): Promise<SchoolStats> {
   const cutoff = thirtyDaysAgo().toISOString().slice(0, 10);
 
-  const [countRow] = await db
-    .select({ total: count() })
-    .from(students)
-    .where(eq(students.isActive, true));
-
-  const [gpaRow] = await db
-    .select({ avgGpa: avg(grades.score) })
-    .from(grades);
-
-  const attendanceRows = await db
-    .select({
-      total: count(),
-      present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
-    })
-    .from(attendanceRecords)
-    .where(gte(attendanceRecords.date, cutoff));
+  const [[countRow], [gpaRow], attendanceRows] = await Promise.all([
+    db.select({ total: count() }).from(students).where(eq(students.isActive, true)),
+    db.select({ avgGpa: avg(grades.score) }).from(grades),
+    db
+      .select({
+        total: count(),
+        present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
+      })
+      .from(attendanceRecords)
+      .where(gte(attendanceRecords.date, cutoff)),
+  ]);
 
   const attRow = attendanceRows[0];
   const attendanceRate =
@@ -184,8 +179,7 @@ export async function getGradeDistribution(): Promise<GradeDistPoint[]> {
     })
     .from(grades)
     .where(isNotNull(grades.letterGrade))
-    .groupBy(grades.letterGrade)
-    .orderBy(grades.letterGrade);
+    .groupBy(grades.letterGrade);
 
   // Ensure grade order A → F, fill in zeros for missing grades
   const order = ["A", "B", "C", "D", "F"];
