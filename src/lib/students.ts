@@ -231,9 +231,36 @@ export async function canTeacherViewStudent(
 }
 
 export async function getStudentById(
-  _studentId: string
+  studentId: string
 ): Promise<StudentDetail | null> {
-  throw new Error("Not implemented");
+  const atRiskIds = await getAtRiskStudentIds();
+
+  const [row] = await db
+    .select({
+      id: students.id,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      gradeLevel: students.gradeLevel,
+      enrolledAt: students.enrolledAt,
+      counselorName: staffProfiles.fullName,
+      isActive: students.isActive,
+    })
+    .from(students)
+    .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
+    .where(eq(students.id, studentId))
+    .limit(1);
+
+  if (!row || !row.isActive) return null;
+
+  return {
+    id: row.id,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    gradeLevel: Number(row.gradeLevel),
+    counselorName: row.counselorName ?? null,
+    enrolledAt: row.enrolledAt ?? null,
+    isAtRisk: atRiskIds.has(row.id),
+  };
 }
 
 export async function getStudentGradesByClass(
