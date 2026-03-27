@@ -43,30 +43,30 @@ function thirtyDaysAgo(): Date {
 export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
   const cutoff = thirtyDaysAgo().toISOString().slice(0, 10);
 
-  // Students with graduation off-track
-  const gradRisk = await db
-    .select({
-      id: students.id,
-      firstName: students.firstName,
-      lastName: students.lastName,
-      gradeLevel: students.gradeLevel,
-      counselorName: staffProfiles.fullName,
-    })
-    .from(graduationPlans)
-    .innerJoin(students, eq(graduationPlans.studentId, students.id))
-    .leftJoin(staffProfiles, eq(students.counselorId, staffProfiles.id))
-    .where(and(eq(students.isActive, true), eq(graduationPlans.onTrack, false)));
-
-  // Students with attendance < 80% in last 30 days
-  const attendanceRows = await db
-    .select({
-      studentId: attendanceRecords.studentId,
-      total: count(),
-      present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
-    })
-    .from(attendanceRecords)
-    .where(gte(attendanceRecords.date, cutoff))
-    .groupBy(attendanceRecords.studentId);
+  // Students with graduation off-track and attendance < 80% in last 30 days (parallel)
+  const [gradRisk, attendanceRows] = await Promise.all([
+    db
+      .select({
+        id: students.id,
+        firstName: students.firstName,
+        lastName: students.lastName,
+        gradeLevel: students.gradeLevel,
+        counselorName: staffProfiles.fullName,
+      })
+      .from(graduationPlans)
+      .innerJoin(students, eq(graduationPlans.studentId, students.id))
+      .leftJoin(staffProfiles, eq(students.counselorId, staffProfiles.id))
+      .where(and(eq(students.isActive, true), eq(graduationPlans.onTrack, false))),
+    db
+      .select({
+        studentId: attendanceRecords.studentId,
+        total: count(),
+        present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
+      })
+      .from(attendanceRecords)
+      .where(gte(attendanceRecords.date, cutoff))
+      .groupBy(attendanceRecords.studentId),
+  ]);
 
   const attendanceRisk = new Set(
     attendanceRows
@@ -125,7 +125,7 @@ export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
 export async function getSchoolStats(atRiskCount: number): Promise<SchoolStats> {
   const cutoff = thirtyDaysAgo().toISOString().slice(0, 10);
 
-  const [[countRow], [gpaRow], attendanceRows] = await Promise.all([
+  const [countRows, gpaRows, attendanceRows] = await Promise.all([
     db.select({ total: count() }).from(students).where(eq(students.isActive, true)),
     db.select({ avgGpa: avg(grades.score) }).from(grades),
     db
@@ -137,6 +137,8 @@ export async function getSchoolStats(atRiskCount: number): Promise<SchoolStats> 
       .where(gte(attendanceRecords.date, cutoff)),
   ]);
 
+  const countRow = countRows[0];
+  const gpaRow = gpaRows[0];
   const attRow = attendanceRows[0];
   const attendanceRate =
     attRow && attRow.total > 0
@@ -144,8 +146,8 @@ export async function getSchoolStats(atRiskCount: number): Promise<SchoolStats> 
       : null;
 
   return {
-    totalStudents: countRow.total,
-    avgGpa: gpaRow.avgGpa !== null ? Math.round(Number(gpaRow.avgGpa) * 10) / 10 : null,
+    totalStudents: countRow?.total ?? 0,
+    avgGpa: gpaRow?.avgGpa != null ? Math.round(Number(gpaRow.avgGpa) * 10) / 10 : null,
     totalAtRisk: atRiskCount,
     attendanceRate,
   };
