@@ -16,8 +16,8 @@ interface AttendanceChartProps {
 }
 
 function formatWeek(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  const [, month, day] = dateStr.split("-");
+  return `${Number(month)}/${Number(day)}`;
 }
 
 export function AttendanceChart({ data }: AttendanceChartProps) {
@@ -37,7 +37,7 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey="week" tick={{ fontSize: 12 }} />
         <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} unit="%" />
-        <Tooltip formatter={(value) => `${value}%`} />
+        <Tooltip formatter={(value) => [`${value}%`, "Attendance"]} />
         <Line
           type="monotone"
           dataKey="rate"
