@@ -21,6 +21,7 @@ const GRADE_LABEL: Record<number, string> = {
 };
 
 function RiskBadge({ reasons }: { reasons: AtRiskStudent["riskReasons"] }) {
+  if (reasons.length === 0) return null;
   if (reasons.length === 2) {
     return <Badge variant="destructive">Both</Badge>;
   }
