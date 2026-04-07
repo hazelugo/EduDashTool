@@ -56,7 +56,7 @@ export function AtRiskTable({ students }: AtRiskTableProps) {
           {students.map((student) => (
             <TableRow key={student.id}>
               <TableCell className="font-medium">
-                <Link href={`/dashboard/students/${student.id}`} className="hover:underline">
+                <Link href={`/students/${student.id}`} className="hover:underline">
                   {student.lastName}, {student.firstName}
                 </Link>
               </TableCell>
