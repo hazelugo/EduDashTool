@@ -18,7 +18,8 @@
       "Bash(npx tsx:*)",
       "Skill(gsd:progress)",
       "Bash(npx tsc:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(curl -s https://edudashtool.hazelugo.com/api/health)"
     ]
   }
 }
