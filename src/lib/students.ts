@@ -264,9 +264,58 @@ export async function getStudentById(
 }
 
 export async function getStudentGradesByClass(
-  _studentId: string
+  studentId: string
 ): Promise<ClassWithGrades[]> {
-  throw new Error("Not implemented");
+  const rows = await db
+    .select({
+      classId: classes.id,
+      courseName: classes.courseName,
+      courseCode: classes.courseCode,
+      semester: classes.semester,
+      schoolYear: classes.schoolYear,
+      gradeId: grades.id,
+      gradeType: grades.gradeType,
+      score: grades.score,
+      letterGrade: grades.letterGrade,
+      gradedAt: grades.gradedAt,
+    })
+    .from(enrollments)
+    .innerJoin(classes, eq(classes.id, enrollments.classId))
+    .leftJoin(
+      grades,
+      and(
+        eq(grades.studentId, enrollments.studentId),
+        eq(grades.classId, classes.id)
+      )
+    )
+    .where(eq(enrollments.studentId, studentId))
+    .orderBy(desc(grades.gradedAt));
+
+  // Group flat rows by class, preserving insertion order
+  const classMap = new Map<string, ClassWithGrades>();
+  for (const row of rows) {
+    if (!classMap.has(row.classId)) {
+      classMap.set(row.classId, {
+        classId: row.classId,
+        courseName: row.courseName,
+        courseCode: row.courseCode ?? "",
+        semester: row.semester,
+        schoolYear: row.schoolYear,
+        grades: [],
+      });
+    }
+    if (row.gradeId != null) {
+      classMap.get(row.classId)!.grades.push({
+        id: row.gradeId,
+        gradeType: row.gradeType!,
+        score: row.score != null ? Number(row.score) : null,
+        letterGrade: row.letterGrade ?? null,
+        gradedAt: row.gradedAt ?? null,
+      });
+    }
+  }
+
+  return [...classMap.values()];
 }
 
 export async function getStudentAttendance(
