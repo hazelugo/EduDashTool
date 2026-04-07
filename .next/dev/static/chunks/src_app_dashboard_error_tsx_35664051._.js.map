@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Hector/Documents/EduDashTool/src/app/dashboard/error.tsx"],"sourcesContent":["\"use client\";\r\n\r\nimport { useEffect } from \"react\";\r\nimport { Button } from \"@/components/ui/button\";\r\n\r\ninterface ErrorProps {\r\n  error: Error & { digest?: string };\r\n  reset: () => void;\r\n}\r\n\r\nexport default function DashboardError({ error, reset }: ErrorProps) {\r\n  useEffect(() => {\r\n    console.error(\"Dashboard error:\", error);\r\n  }, [error]);\r\n\r\n  return (\r\n    <div className=\"flex flex-1 flex-col items-center justify-center gap-4 p-6\">\r\n      <p className=\"text-sm text-muted-foreground\">\r\n        Something went wrong loading the dashboard.\r\n      </p>\r\n      <Button variant=\"outline\" size=\"sm\" onClick={reset}>\r\n        Try again\r\n      </Button>\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;AAEA;AACA;;;AAHA;;;AAUe,SAAS,eAAe,EAAE,KAAK,EAAE,KAAK,EAAc;;IACjE,IAAA,0KAAS;oCAAC;YACR,QAAQ,KAAK,CAAC,oBAAoB;QACpC;mCAAG;QAAC;KAAM;IAEV,qBACE,6LAAC;QAAI,WAAU;;0BACb,6LAAC;gBAAE,WAAU;0BAAgC;;;;;;0BAG7C,6LAAC,+IAAM;gBAAC,SAAQ;gBAAU,MAAK;gBAAK,SAAS;0BAAO;;;;;;;;;;;;AAK1D;GAfwB;KAAA"}}]
+}
