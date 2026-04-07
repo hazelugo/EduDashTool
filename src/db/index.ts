@@ -2,9 +2,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-// Supabase-Vercel integration injects POSTGRES_URL; manual setup uses DATABASE_URL
+// DATABASE_URL is the canonical connection string (set in .env.local and Vercel env vars)
 // Strip query params (?pgbouncer=true, etc.) — postgres-js handles these via options, not URL
-const rawConnection = process.env.POSTGRES_URL ?? process.env.DATABASE_URL ?? "";
+const rawConnection = process.env.DATABASE_URL ?? "";
 const connectionString = rawConnection.split("?")[0];
 
 // prepare: false is REQUIRED for Supabase Transaction pool mode (port 6543)
