@@ -318,24 +318,115 @@ export async function getStudentGradesByClass(
   return [...classMap.values()];
 }
 
-export async function getStudentAttendance(
-  _studentId: string
-): Promise<StudentAttendanceStats> {
-  throw new Error("Not implemented");
+export async function getStudentAttendance(studentId: string): Promise<StudentAttendanceStats> {
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const cutoff = ninetyDaysAgo.toISOString().slice(0, 10);
+
+  const [totals, weeklyRows] = await Promise.all([
+    db
+      .select({
+        status: attendanceRecords.status,
+        total: count(),
+      })
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.studentId, studentId),
+          gte(attendanceRecords.date, cutoff)
+        )
+      )
+      .groupBy(attendanceRecords.status),
+    db
+      .select({
+        week: sql<string>`date_trunc('week', ${attendanceRecords.date}::timestamp)::date::text`,
+        total: count(),
+        present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
+      })
+      .from(attendanceRecords)
+      .where(
+        and(
+          eq(attendanceRecords.studentId, studentId),
+          gte(attendanceRecords.date, cutoff)
+        )
+      )
+      .groupBy(sql`date_trunc('week', ${attendanceRecords.date}::timestamp)`)
+      .orderBy(sql`date_trunc('week', ${attendanceRecords.date}::timestamp)`),
+  ]);
+
+  const stats = { present: 0, absent: 0, tardy: 0, excused: 0 };
+  for (const row of totals) {
+    if (row.status === "present") stats.present = row.total;
+    else if (row.status === "absent") stats.absent = row.total;
+    else if (row.status === "tardy") stats.tardy = row.total;
+    else if (row.status === "excused") stats.excused = row.total;
+  }
+
+  const totalDays = stats.present + stats.absent + stats.tardy + stats.excused;
+  const rate = totalDays > 0 ? Math.round((stats.present / totalDays) * 100) : null;
+
+  return {
+    ...stats,
+    rate,
+    trend: weeklyRows.map((r) => ({
+      week: r.week,
+      rate: r.total > 0 ? Math.round((Number(r.present) / r.total) * 100) : 0,
+    })),
+  };
 }
 
-export async function getStudentTests(_studentId: string): Promise<TestScore[]> {
-  throw new Error("Not implemented");
+export async function getStudentTests(studentId: string): Promise<TestScore[]> {
+  const rows = await db
+    .select()
+    .from(standardizedTests)
+    .where(eq(standardizedTests.studentId, studentId))
+    .orderBy(desc(standardizedTests.testDate));
+
+  return rows.map((r) => ({
+    id: r.id,
+    testType: r.testType,
+    testDate: r.testDate ?? null,
+    totalScore: r.totalScore ?? null,
+    mathScore: r.mathScore ?? null,
+    readingScore: r.readingScore ?? null,
+    writingScore: r.writingScore ?? null,
+    targetScore: r.targetScore ?? null,
+  }));
 }
 
-export async function getStudentGraduationPlan(
-  _studentId: string
-): Promise<GraduationPlanData> {
-  throw new Error("Not implemented");
+export async function getStudentGraduationPlan(studentId: string): Promise<GraduationPlanData> {
+  const rows = await db
+    .select()
+    .from(graduationPlans)
+    .where(eq(graduationPlans.studentId, studentId))
+    .limit(1);
+
+  const r = rows[0];
+  if (!r) return null;
+
+  return {
+    creditsEarned: Number(r.creditsEarned ?? 0),
+    creditsRequired: Number(r.creditsRequired ?? 24),
+    onTrack: r.onTrack ?? true,
+    planData: r.planData as Record<string, unknown> | null,
+  };
 }
 
-export async function getStudentCollegePrepPlan(
-  _studentId: string
-): Promise<CollegePrepData> {
-  throw new Error("Not implemented");
+export async function getStudentCollegePrepPlan(studentId: string): Promise<CollegePrepData> {
+  const rows = await db
+    .select()
+    .from(collegePrepPlans)
+    .where(eq(collegePrepPlans.studentId, studentId))
+    .limit(1);
+
+  const r = rows[0];
+  if (!r) return null;
+
+  return {
+    targetSchools: (r.targetSchools as unknown[]) ?? [],
+    applicationDeadline: r.applicationDeadline ?? null,
+    essayStatus: r.essayStatus ?? null,
+    recommendationStatus: r.recommendationStatus ?? null,
+    notes: r.notes ?? null,
+  };
 }

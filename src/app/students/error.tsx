@@ -16,8 +16,11 @@ export default function StudentsError({ error, reset }: ErrorProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
       <p className="text-sm text-muted-foreground">
-        Something went wrong. Try again.
+        Something went wrong loading students.
       </p>
+      {error.digest && (
+        <p className="text-xs text-muted-foreground font-mono">digest: {error.digest}</p>
+      )}
       <Button variant="outline" size="sm" onClick={reset}>
         Try again
       </Button>
