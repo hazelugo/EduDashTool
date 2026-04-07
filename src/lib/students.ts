@@ -18,7 +18,6 @@ import {
   gte,
   desc,
   count,
-  inArray,
   sql,
 } from "drizzle-orm";
 
@@ -111,32 +110,23 @@ function thirtyDaysAgo(): string {
   return d.toISOString().slice(0, 10);
 }
 
-async function getAtRiskStudentIds(): Promise<Set<string>> {
-  const cutoff = thirtyDaysAgo();
+function attendanceSubquery(cutoff: string) {
+  return db
+    .select({
+      studentId: attendanceRecords.studentId,
+      total: sql<number>`count(*)`.as("total"),
+      presentCount: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`.as("present_count"),
+    })
+    .from(attendanceRecords)
+    .where(gte(attendanceRecords.date, cutoff))
+    .groupBy(attendanceRecords.studentId)
+    .as("att");
+}
 
-  const [gradRisk, attendanceRows] = await Promise.all([
-    db
-      .select({ studentId: graduationPlans.studentId })
-      .from(graduationPlans)
-      .where(eq(graduationPlans.onTrack, false)),
-    db
-      .select({
-        studentId: attendanceRecords.studentId,
-        total: count(),
-        present: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`,
-      })
-      .from(attendanceRecords)
-      .where(gte(attendanceRecords.date, cutoff))
-      .groupBy(attendanceRecords.studentId),
-  ]);
-
-  const ids = new Set<string>(gradRisk.map((r) => r.studentId!));
-  for (const r of attendanceRows) {
-    if (r.total > 0 && Number(r.present) / r.total < 0.8) {
-      ids.add(r.studentId);
-    }
-  }
-  return ids;
+function computeIsAtRisk(onTrack: boolean | null, attTotal: number | null, attPresent: number | null): boolean {
+  if (onTrack === false) return true;
+  if (attTotal && attTotal > 0 && Number(attPresent) / attTotal < 0.8) return true;
+  return false;
 }
 
 // ── Queries ───────────────────────────────────────────────────────────────────
@@ -145,8 +135,8 @@ export async function getStudentList(
   params: GetStudentListParams
 ): Promise<StudentRow[]> {
   const { search, grade, atRisk, viewerId, viewerRole } = params;
-
-  const atRiskIds = await getAtRiskStudentIds();
+  const cutoff = thirtyDaysAgo();
+  const attSub = attendanceSubquery(cutoff);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const conditions: any[] = [eq(students.isActive, true)];
@@ -159,14 +149,8 @@ export async function getStudentList(
       )!
     );
   }
-
   if (grade != null) {
     conditions.push(eq(students.gradeLevel, grade));
-  }
-
-  if (atRisk === true) {
-    if (atRiskIds.size === 0) return [];
-    conditions.push(inArray(students.id, [...atRiskIds]));
   }
 
   const selectedFields = {
@@ -175,9 +159,12 @@ export async function getStudentList(
     lastName: students.lastName,
     gradeLevel: students.gradeLevel,
     counselorName: staffProfiles.fullName,
+    onTrack: graduationPlans.onTrack,
+    attTotal: attSub.total,
+    attPresent: attSub.presentCount,
   };
 
-  let rows: { id: string; firstName: string; lastName: string; gradeLevel: number; counselorName: string | null }[];
+  let rows: { id: string; firstName: string; lastName: string; gradeLevel: number; counselorName: string | null; onTrack: boolean | null; attTotal: number | null; attPresent: number | null }[];
 
   if (viewerRole === "teacher") {
     rows = await db
@@ -189,6 +176,8 @@ export async function getStudentList(
         and(eq(classes.id, enrollments.classId), eq(classes.teacherId, viewerId))
       )
       .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
+      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
+      .leftJoin(attSub, eq(attSub.studentId, students.id))
       .where(and(...conditions))
       .orderBy(students.lastName, students.firstName);
   } else {
@@ -196,18 +185,22 @@ export async function getStudentList(
       .select(selectedFields)
       .from(students)
       .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
+      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
+      .leftJoin(attSub, eq(attSub.studentId, students.id))
       .where(and(...conditions))
       .orderBy(students.lastName, students.firstName);
   }
 
-  return rows.map((row) => ({
+  const result = rows.map((row) => ({
     id: row.id,
     firstName: row.firstName,
     lastName: row.lastName,
     gradeLevel: Number(row.gradeLevel),
     counselorName: row.counselorName ?? null,
-    isAtRisk: atRiskIds.has(row.id),
+    isAtRisk: computeIsAtRisk(row.onTrack, row.attTotal, row.attPresent),
   }));
+
+  return atRisk !== undefined ? result.filter((s) => s.isAtRisk === atRisk) : result;
 }
 
 export async function canTeacherViewStudent(
@@ -233,7 +226,8 @@ export async function canTeacherViewStudent(
 export async function getStudentById(
   studentId: string
 ): Promise<StudentDetail | null> {
-  const atRiskIds = await getAtRiskStudentIds();
+  const cutoff = thirtyDaysAgo();
+  const attSub = attendanceSubquery(cutoff);
 
   const [row] = await db
     .select({
@@ -244,9 +238,14 @@ export async function getStudentById(
       enrolledAt: students.enrolledAt,
       counselorName: staffProfiles.fullName,
       isActive: students.isActive,
+      onTrack: graduationPlans.onTrack,
+      attTotal: attSub.total,
+      attPresent: attSub.presentCount,
     })
     .from(students)
     .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
+    .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
+    .leftJoin(attSub, eq(attSub.studentId, students.id))
     .where(eq(students.id, studentId))
     .limit(1);
 
@@ -259,7 +258,7 @@ export async function getStudentById(
     gradeLevel: Number(row.gradeLevel),
     counselorName: row.counselorName ?? null,
     enrolledAt: row.enrolledAt ?? null,
-    isAtRisk: atRiskIds.has(row.id),
+    isAtRisk: computeIsAtRisk(row.onTrack, row.attTotal, row.attPresent),
   };
 }
 
