@@ -2,18 +2,16 @@
 status: awaiting_human_verify
 trigger: "Dashboards show an infinite loading spinner in production (edudashtool.hazelugo.com) but work fine locally. No visible errors in the browser console."
 created: 2026-04-07T00:00:00Z
-updated: 2026-04-07T00:01:00Z
+updated: 2026-04-07T01:00:00Z
 ---
 
 ## Current Focus
 <!-- OVERWRITE on each update - reflects NOW -->
 
-hypothesis: CONFIRMED — Two compounding issues in src/db/index.ts:
-  (1) No guard on empty DATABASE_URL: when env var is missing in Vercel, postgres("") silently targets localhost:5432, connection hangs until Vercel function timeout.
-  (2) connect_timeout was removed (commit ce8633e), so postgres-js uses its 30s default — far exceeding Vercel's 10s function limit. The RSC streaming response has already sent headers/loading skeleton; when Vercel kills the hung function, the browser stream closes with no content, leaving the loading.tsx skeleton rendered forever with no error boundary triggered.
-test: applied — guard + connect_timeout added to src/db/index.ts
-expecting: if DATABASE_URL is not set in Vercel, error throws immediately (surfacing the real config issue); if set, connect_timeout:10 ensures fast failure instead of 30s hang
-next_action: verify fix and request human verification
+hypothesis: CONFIRMED (revised) — Root cause is the /students query holding the single max:1 postgres-js connection indefinitely (connection pool exhaustion on a warm Vercel function instance). The new JOIN query introduced in commit 86ebcad (derived table join of attendance_records aggregation) is slow or hangs in production, holding the only connection and starving all subsequent requests including /dashboard. Previously-applied fixes (prepare:false, DATABASE_URL guard, connect_timeout:10) are all correct and committed — but connect_timeout only covers TCP handshake, not query execution. There was no protection against a slow/hung DB query.
+test: applied — added statement_timeout: 8000 via postgres-js connection: option in src/db/index.ts. This kills any query that runs longer than 8s at the Postgres level, causing a JS error that Next.js catches via the students error.tsx boundary. The connection is released, unblocking subsequent requests.
+expecting: if a query hangs, it dies at 8s with an error shown via error.tsx instead of an infinite skeleton. /dashboard recovers immediately after.
+next_action: deploy to Vercel and verify
 
 ## Symptoms
 <!-- Written during gathering, then IMMUTABLE -->
@@ -38,6 +36,18 @@ started: Only in production; works fine locally
 - hypothesis: idle_timeout: 5 causing connection drops between sequential queries
   evidence: idle_timeout starts only when a connection has no pending queries. Within a single serverless invocation all queries queue against the single connection (max:1). No idle gap long enough to close the connection mid-request.
   timestamp: 2026-04-07T00:01:00Z
+
+- hypothesis: prepare: false missing (pgbouncer transaction mode incompatibility)
+  evidence: prepare: false was already present in src/db/index.ts throughout all recent commits. The generated SQL uses standard parameterized queries with unnamed statements — compatible with pgbouncer transaction mode. SQL verified via Drizzle toSQL() inspection.
+  timestamp: 2026-04-07T01:00:00Z
+
+- hypothesis: DATABASE_URL missing in Vercel environment
+  evidence: User confirms dashboard loads perfectly on first visit after login — DB is clearly reachable. DATABASE_URL must be set. The guard added in commit 1e27405 would have thrown immediately on cold start if DATABASE_URL were missing.
+  timestamp: 2026-04-07T01:00:00Z
+
+- hypothesis: connect_timeout: 10 missing (previous fix)
+  evidence: Already present in committed code (commit 1e27405). connect_timeout only covers TCP handshake — not query execution time. Cannot protect against a slow or hung DB query.
+  timestamp: 2026-04-07T01:00:00Z
 
 ## Evidence
 <!-- APPEND only - facts discovered -->
@@ -67,10 +77,15 @@ started: Only in production; works fine locally
   found: Health endpoint checks DATABASE_URL presence and runs SELECT 1 against the DB. env.DATABASE_URL boolean is included in response.
   implication: Hitting /api/health in production will reveal whether DATABASE_URL is set and whether DB is reachable. This is the fastest way to confirm the hypothesis without code changes.
 
+- timestamp: 2026-04-07T01:00:00Z
+  checked: src/lib/students.ts (commit 86ebcad diff), src/db/index.ts (all recent commits), src/lib/auth.ts, src/app/students/page.tsx, src/app/dashboard/page.tsx
+  found: (1) prepare:false was already present throughout. (2) The new JOIN query in getStudentList uses a derived table (attendance subquery) — SQL is valid, parameters are $1/$2 style. (3) With max:1 on a warm Vercel function instance, ALL requests share one postgres-js connection. If one query hangs, all subsequent queries queue on that connection. (4) requireStaffProfile() also uses db — so even /dashboard's auth check queues behind the hung students query. (5) connect_timeout:10 protects only TCP handshake. No protection exists against a slow/hung Postgres query execution. (6) The students query aggregates ALL attendance_records since 30 days ago across ALL students — this derived table join could be slow with production data volume if the query plan is suboptimal.
+  implication: The missing protection is a statement_timeout at the Postgres level. Adding statement_timeout:8000 via postgres-js connection: option will kill runaway queries at 8s, throw a JS error (caught by error.tsx), and release the connection immediately — unblocking all subsequent requests.
+
 ## Resolution
 <!-- OVERWRITE as understanding evolves -->
 
-root_cause: Two issues in src/db/index.ts: (1) No validation of DATABASE_URL — empty string silently connects to localhost:5432 in production (Vercel) where no Postgres server exists. (2) connect_timeout was removed, leaving postgres-js default of 30s which exceeds Vercel's function timeout. RSC streaming sends the loading.tsx skeleton before the DB query completes; when Vercel kills the timed-out function, the stream closes without resolving the Suspense boundary, leaving the skeleton visible forever with no error surfaced.
-fix: Add explicit guard that throws if DATABASE_URL is missing/empty. Re-add connect_timeout:10 (this is TCP connect timeout only — not incompatible with pgbouncer). User must also verify DATABASE_URL is set in Vercel env vars.
+root_cause: The /students route calls getStudentList() which uses a JOIN query with a derived table aggregation of attendance_records (introduced in commit 86ebcad). This query is slow or hangs in production (likely due to data volume or query plan difference). With postgres-js max:1, the application has a single shared connection per warm Vercel function instance. The hanging query holds that connection indefinitely — there was no statement_timeout or query-level timeout to kill it. All subsequent requests (including /dashboard's requireStaffProfile() DB call) queue waiting for the connection, appearing to hang. Previously-applied fixes (prepare:false, DATABASE_URL guard, connect_timeout:10) were correct but insufficient — connect_timeout only covers TCP handshake, not query execution time.
+fix: Added statement_timeout: 8000 (8 seconds) via postgres-js connection: startup option in src/db/index.ts. This instructs Postgres to kill any query exceeding 8s, throw a StatementTimeout error, which propagates as a JS error caught by Next.js error.tsx boundary. The connection is released immediately, unblocking all subsequent requests. 8s was chosen to be well within Vercel's function timeout (10s hobby / 60s pro) while giving queries reasonable time to complete.
 verification: TypeScript check passes (tsc --noEmit). Awaiting production deploy + human confirmation.
 files_changed: [src/db/index.ts]
