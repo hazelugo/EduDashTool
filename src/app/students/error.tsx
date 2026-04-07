@@ -18,7 +18,9 @@ export default function StudentsError({ error, reset }: ErrorProps) {
       <p className="text-sm text-muted-foreground">
         Something went wrong loading students.
       </p>
-      <p className="text-xs text-muted-foreground font-mono">{error.message}</p>
+      {error.digest && (
+        <p className="text-xs text-muted-foreground font-mono">digest: {error.digest}</p>
+      )}
       <Button variant="outline" size="sm" onClick={reset}>
         Try again
       </Button>
