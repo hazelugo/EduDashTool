@@ -18,10 +18,15 @@ const connectionString = rawConnection.split("?")[0];
 // max: 1 is REQUIRED for serverless (Vercel) — limits connections per function invocation
 // idle_timeout: 5 closes idle connections quickly to avoid pool exhaustion
 // connect_timeout: 10 limits TCP handshake time — prevents 30s silent hang on bad/missing URL
+// connection.statement_timeout kills any query that runs longer than 8s at the Postgres level,
+//   preventing a single slow query from holding the only connection and starving all other requests
 const client = postgres(connectionString, {
   prepare: false,
   max: 1,
   idle_timeout: 5,
   connect_timeout: 10,
+  connection: {
+    statement_timeout: 8000, // 8 seconds — kills runaway queries before Vercel's 10s function timeout
+  },
 });
 export const db = drizzle({ client, schema });
