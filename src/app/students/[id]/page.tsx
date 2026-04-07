@@ -8,6 +8,9 @@ import {
   canTeacherViewStudent,
 } from "@/lib/students";
 import { logAuditEntry } from "@/lib/audit";
+import { db } from "@/db";
+import { students } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -53,13 +56,12 @@ export default async function StudentProfilePage({
 
   // Counselors can only view their assigned students
   if (profile.role === "counselor") {
-    // getStudentById doesn't filter by counselor — check via list
-    const { getStudentList } = await import("@/lib/students");
-    const visible = await getStudentList({
-      viewerId: profile.userId,
-      viewerRole: "counselor",
-    });
-    if (!visible.find((s) => s.id === studentId)) redirect("/no-access");
+    const rows = await db
+      .select({ id: students.id })
+      .from(students)
+      .where(and(eq(students.id, studentId), eq(students.counselorId, profile.userId)))
+      .limit(1);
+    if (rows.length === 0) redirect("/no-access");
   }
 
   // FERPA audit log
