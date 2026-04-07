@@ -6,5 +6,7 @@
   "/dashboard/page": "app/dashboard/page.js",
   "/login/page": "app/login/page.js",
   "/no-access/page": "app/no-access/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/students/[id]/page": "app/students/[id]/page.js",
+  "/students/page": "app/students/page.js"
 }

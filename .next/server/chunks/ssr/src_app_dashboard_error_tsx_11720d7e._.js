@@ -1,0 +1,3 @@
+module.exports=[2042,a=>{"use strict";var b=a.i(87924),c=a.i(72131),d=a.i(18697);function e({error:a,reset:e}){return(0,c.useEffect)(()=>{console.error("Dashboard error:",a)},[a]),(0,b.jsxs)("div",{className:"flex flex-1 flex-col items-center justify-center gap-4 p-6",children:[(0,b.jsx)("p",{className:"text-sm text-muted-foreground",children:"Something went wrong loading the dashboard."}),(0,b.jsx)(d.Button,{variant:"outline",size:"sm",onClick:e,children:"Try again"})]})}a.s(["default",()=>e])}];
+
+//# sourceMappingURL=src_app_dashboard_error_tsx_11720d7e._.js.map

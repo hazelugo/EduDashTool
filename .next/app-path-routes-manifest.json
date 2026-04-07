@@ -6,5 +6,7 @@
   "/dashboard/page": "/dashboard",
   "/login/page": "/login",
   "/no-access/page": "/no-access",
-  "/page": "/"
+  "/page": "/",
+  "/students/[id]/page": "/students/[id]",
+  "/students/page": "/students"
 }
