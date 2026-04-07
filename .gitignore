@@ -1,4 +1,8 @@
 node_modules
+.next/
+tsconfig.tsbuildinfo
 .env
 .env.local
 .env*.local
+.claude/settings.local.json
+playwright-report/
