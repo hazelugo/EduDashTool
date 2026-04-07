@@ -15,8 +15,11 @@ export async function GET() {
     return Response.json({ status: 'ok', db: 'ok', env: envCheck })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'unknown'
+    const cause = error instanceof Error && error.cause instanceof Error
+      ? error.cause.message
+      : String((error as { cause?: unknown } | null)?.cause ?? '')
     return Response.json(
-      { status: 'error', db: 'unreachable', error: message, env: envCheck },
+      { status: 'error', db: 'unreachable', error: message, cause, env: envCheck },
       { status: 503 }
     )
   }
