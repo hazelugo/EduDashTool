@@ -13,7 +13,7 @@ EduDash is built from a working Next.js 16 shell (currently "Song Tool") that ha
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation and Schema** - Fix three live blockers and define all 10 database tables (completed 2026-03-15)
-- [x] **Phase 2: Role System and Staff Profiles** - Wire staff roles to auth and enforce role-scoped data access (completed 2026-03-16)
+- [x] **Phase 2: Role System and Staff Profiles** - Wire staff roles to auth and enforce role-scoped data access (completed 2026-03-16)
 - [ ] **Phase 3: Student List and Search** - Paginated, searchable, role-scoped student list
 - [ ] **Phase 4: Student Profile — Read** - Unified student profile page displaying all aggregated data
 - [ ] **Phase 5: Data Entry — Write** - Staff forms and server actions for all student data mutations
@@ -59,7 +59,12 @@ Plans:
   2. A counselor or principal opening the student list sees all students school-wide with pagination
   3. Typing a student's name in the search bar filters the visible list in real time
   4. Selecting a grade level, class/course, or risk level filter narrows the list to matching students
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Wave 0 tests + backend query fixes (pagination, counselor bug, risk level, course filter)
+- [ ] 03-02-PLAN.md — StudentFilters: debounce fix, course dropdown, 3-level risk select
+- [ ] 03-03-PLAN.md — Students page: pagination controls, StudentTableBody, 3-level badge
 
 ### Phase 4: Student Profile — Read
 **Goal**: Clicking any student opens a single page that displays their complete academic picture with no missing panels or broken layouts
@@ -118,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation and Schema | 5/5 | Complete   | 2026-03-15 |
 | 2. Role System and Staff Profiles | 3/3 | Complete    | 2026-03-16 |
-| 3. Student List and Search | 0/TBD | Not started | - |
+| 3. Student List and Search | 0/3 | Planning | - |
 | 4. Student Profile — Read | 0/TBD | Not started | - |
 | 5. Data Entry — Write | 0/TBD | Not started | - |
 | 6. Gemini AI Integration | 0/TBD | Not started | - |
