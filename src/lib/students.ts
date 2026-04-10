@@ -1,27 +1,15 @@
-<<<<<<< HEAD
 // Student list and profile query functions
 
-=======
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
 import { db } from "@/db";
 import {
   students,
   staffProfiles,
-<<<<<<< HEAD
   classes,
   enrollments,
   graduationPlans,
   attendanceRecords,
   grades,
   standardizedTests,
-=======
-  enrollments,
-  classes,
-  attendanceRecords,
-  grades,
-  standardizedTests,
-  graduationPlans,
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
   collegePrepPlans,
 } from "@/db/schema";
 import {
@@ -29,7 +17,6 @@ import {
   and,
   or,
   ilike,
-<<<<<<< HEAD
   sql,
   count,
   gte,
@@ -41,15 +28,6 @@ import {
 export const PAGE_SIZE = 25;
 
 export type RiskLevel = "at-risk" | "watch" | "on-track";
-=======
-  gte,
-  desc,
-  count,
-  sql,
-} from "drizzle-orm";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 export type StudentRow = {
   id: string;
@@ -57,16 +35,12 @@ export type StudentRow = {
   lastName: string;
   gradeLevel: number;
   counselorName: string | null;
-<<<<<<< HEAD
   riskLevel: RiskLevel;
 };
 
 export type StudentListResult = {
   rows: StudentRow[];
   total: number;
-=======
-  isAtRisk: boolean;
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
 };
 
 export type StudentDetail = {
@@ -76,7 +50,6 @@ export type StudentDetail = {
   gradeLevel: number;
   counselorName: string | null;
   enrolledAt: string | null;
-<<<<<<< HEAD
   riskLevel: RiskLevel;
 };
 
@@ -86,11 +59,6 @@ export function deriveRiskLevel(onTrack: boolean | null): RiskLevel {
   return "watch";
 }
 
-=======
-  isAtRisk: boolean;
-};
-
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
 export type GradeEntry = {
   id: string;
   gradeType: "midterm" | "final" | "quarter" | "assignment";
@@ -146,19 +114,14 @@ export type CollegePrepData = {
 export type GetStudentListParams = {
   search?: string;
   grade?: number;
-<<<<<<< HEAD
   riskLevel?: RiskLevel;
   course?: string;
   page?: number;
   limit?: number;
-=======
-  atRisk?: boolean;
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
   viewerId: string;
   viewerRole: "principal" | "counselor" | "teacher";
 };
 
-<<<<<<< HEAD
 export async function getStudentList(params: GetStudentListParams): Promise<StudentListResult> {
   const { search, grade, riskLevel, course, viewerId, viewerRole } = params;
   const page = params.page ?? 1;
@@ -279,142 +242,11 @@ export async function getCourseOptions(
 
 export async function getStudentById(studentId: string): Promise<StudentDetail | null> {
   const rows = await db
-=======
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function thirtyDaysAgo(): string {
-  const d = new Date();
-  d.setDate(d.getDate() - 30);
-  return d.toISOString().slice(0, 10);
-}
-
-function attendanceSubquery(cutoff: string) {
-  return db
-    .select({
-      studentId: attendanceRecords.studentId,
-      total: sql<number>`count(*)`.as("total"),
-      presentCount: sql<number>`sum(case when ${attendanceRecords.status} = 'present' then 1 else 0 end)`.as("present_count"),
-    })
-    .from(attendanceRecords)
-    .where(gte(attendanceRecords.date, cutoff))
-    .groupBy(attendanceRecords.studentId)
-    .as("att");
-}
-
-function computeIsAtRisk(onTrack: boolean | null, attTotal: number | null, attPresent: number | null): boolean {
-  if (onTrack === false) return true;
-  if (attTotal && attTotal > 0 && Number(attPresent) / attTotal < 0.8) return true;
-  return false;
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function getStudentList(
-  params: GetStudentListParams
-): Promise<StudentRow[]> {
-  const { search, grade, atRisk, viewerId, viewerRole } = params;
-  const cutoff = thirtyDaysAgo();
-  const attSub = attendanceSubquery(cutoff);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const conditions: any[] = [eq(students.isActive, true)];
-
-  if (search) {
-    conditions.push(
-      or(
-        ilike(students.firstName, `%${search}%`),
-        ilike(students.lastName, `%${search}%`)
-      )!
-    );
-  }
-  if (grade != null) {
-    conditions.push(eq(students.gradeLevel, grade));
-  }
-
-  const selectedFields = {
-    id: students.id,
-    firstName: students.firstName,
-    lastName: students.lastName,
-    gradeLevel: students.gradeLevel,
-    counselorName: staffProfiles.fullName,
-    onTrack: graduationPlans.onTrack,
-    attTotal: attSub.total,
-    attPresent: attSub.presentCount,
-  };
-
-  let rows: { id: string; firstName: string; lastName: string; gradeLevel: number; counselorName: string | null; onTrack: boolean | null; attTotal: number | null; attPresent: number | null }[];
-
-  if (viewerRole === "teacher") {
-    rows = await db
-      .selectDistinct(selectedFields)
-      .from(students)
-      .innerJoin(enrollments, eq(enrollments.studentId, students.id))
-      .innerJoin(
-        classes,
-        and(eq(classes.id, enrollments.classId), eq(classes.teacherId, viewerId))
-      )
-      .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
-      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
-      .leftJoin(attSub, eq(attSub.studentId, students.id))
-      .where(and(...conditions))
-      .orderBy(students.lastName, students.firstName);
-  } else {
-    rows = await db
-      .select(selectedFields)
-      .from(students)
-      .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
-      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
-      .leftJoin(attSub, eq(attSub.studentId, students.id))
-      .where(and(...conditions))
-      .orderBy(students.lastName, students.firstName);
-  }
-
-  const result = rows.map((row) => ({
-    id: row.id,
-    firstName: row.firstName,
-    lastName: row.lastName,
-    gradeLevel: Number(row.gradeLevel),
-    counselorName: row.counselorName ?? null,
-    isAtRisk: computeIsAtRisk(row.onTrack, row.attTotal, row.attPresent),
-  }));
-
-  return atRisk !== undefined ? result.filter((s) => s.isAtRisk === atRisk) : result;
-}
-
-export async function canTeacherViewStudent(
-  teacherId: string,
-  studentId: string
-): Promise<boolean> {
-  const [row] = await db
-    .select({ id: enrollments.id })
-    .from(enrollments)
-    .innerJoin(
-      classes,
-      and(
-        eq(classes.id, enrollments.classId),
-        eq(classes.teacherId, teacherId)
-      )
-    )
-    .where(eq(enrollments.studentId, studentId))
-    .limit(1);
-
-  return row != null;
-}
-
-export async function getStudentById(
-  studentId: string
-): Promise<StudentDetail | null> {
-  const cutoff = thirtyDaysAgo();
-  const attSub = attendanceSubquery(cutoff);
-
-  const [row] = await db
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
     .select({
       id: students.id,
       firstName: students.firstName,
       lastName: students.lastName,
       gradeLevel: students.gradeLevel,
-<<<<<<< HEAD
       counselorName: staffProfiles.fullName,
       enrolledAt: students.enrolledAt,
       onTrack: graduationPlans.onTrack,
@@ -440,38 +272,6 @@ export async function getStudentById(
 }
 
 export async function getStudentGradesByClass(studentId: string): Promise<ClassWithGrades[]> {
-=======
-      enrolledAt: students.enrolledAt,
-      counselorName: staffProfiles.fullName,
-      isActive: students.isActive,
-      onTrack: graduationPlans.onTrack,
-      attTotal: attSub.total,
-      attPresent: attSub.presentCount,
-    })
-    .from(students)
-    .leftJoin(staffProfiles, eq(staffProfiles.id, students.counselorId))
-    .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
-    .leftJoin(attSub, eq(attSub.studentId, students.id))
-    .where(eq(students.id, studentId))
-    .limit(1);
-
-  if (!row || !row.isActive) return null;
-
-  return {
-    id: row.id,
-    firstName: row.firstName,
-    lastName: row.lastName,
-    gradeLevel: Number(row.gradeLevel),
-    counselorName: row.counselorName ?? null,
-    enrolledAt: row.enrolledAt ?? null,
-    isAtRisk: computeIsAtRisk(row.onTrack, row.attTotal, row.attPresent),
-  };
-}
-
-export async function getStudentGradesByClass(
-  studentId: string
-): Promise<ClassWithGrades[]> {
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
   const rows = await db
     .select({
       classId: classes.id,
@@ -489,24 +289,12 @@ export async function getStudentGradesByClass(
     .innerJoin(classes, eq(classes.id, enrollments.classId))
     .leftJoin(
       grades,
-<<<<<<< HEAD
       and(eq(grades.classId, classes.id), eq(grades.studentId, studentId))
     )
     .where(eq(enrollments.studentId, studentId))
     .orderBy(classes.schoolYear, classes.semester, classes.courseName);
 
   // Group by class
-=======
-      and(
-        eq(grades.studentId, enrollments.studentId),
-        eq(grades.classId, classes.id)
-      )
-    )
-    .where(eq(enrollments.studentId, studentId))
-    .orderBy(desc(grades.gradedAt));
-
-  // Group flat rows by class, preserving insertion order
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
   const classMap = new Map<string, ClassWithGrades>();
   for (const row of rows) {
     if (!classMap.has(row.classId)) {
@@ -519,11 +307,7 @@ export async function getStudentGradesByClass(
         grades: [],
       });
     }
-<<<<<<< HEAD
     if (row.gradeId) {
-=======
-    if (row.gradeId != null) {
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
       classMap.get(row.classId)!.grades.push({
         id: row.gradeId,
         gradeType: row.gradeType!,
@@ -649,7 +433,6 @@ export async function getStudentCollegePrepPlan(studentId: string): Promise<Coll
     notes: r.notes ?? null,
   };
 }
-<<<<<<< HEAD
 
 export async function canTeacherViewStudent(
   teacherId: string,
@@ -669,5 +452,3 @@ export async function canTeacherViewStudent(
 
   return rows.length > 0;
 }
-=======
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f

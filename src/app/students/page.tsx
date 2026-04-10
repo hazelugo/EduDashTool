@@ -1,78 +1,65 @@
 import { requireStaffProfile } from "@/lib/auth";
-import { getStudentList } from "@/lib/students";
-<<<<<<< HEAD
+import { getStudentList, getCourseOptions, PAGE_SIZE } from "@/lib/students";
+import type { RiskLevel } from "@/lib/students";
 import { StudentFilters } from "./_components/student-filters";
+import { StudentTableBody } from "./_components/student-table-body";
+import { PaginationControls } from "./_components/pagination-controls";
 import {
   Table,
-  TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
 import { Suspense } from "react";
-
-const GRADE_LABEL: Record<number, string> = {
-  9: "9th",
-  10: "10th",
-  11: "11th",
-  12: "12th",
-};
 
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; grade?: string; atRisk?: string }>;
+  searchParams: Promise<{
+    search?: string;
+    grade?: string;
+    riskLevel?: string;
+    course?: string;
+    page?: string;
+  }>;
 }) {
   const profile = await requireStaffProfile();
   const params = await searchParams;
 
   const search = params.search ?? "";
   const gradeParam = params.grade ? Number(params.grade) : undefined;
-  const atRiskParam =
-    params.atRisk === "true" ? true : params.atRisk === "false" ? false : undefined;
+  const riskLevelParam = (params.riskLevel as RiskLevel) || undefined;
+  const courseParam = params.course || undefined;
+  const pageParam = params.page ? Math.max(1, Number(params.page)) : 1;
 
-  const studentList = await getStudentList({
-    search: search || undefined,
-    grade: gradeParam,
-    atRisk: atRiskParam,
-=======
-import { SearchBar } from "@/components/students/search-bar";
-import { StudentsTable } from "@/components/students/students-table";
+  const [{ rows: studentList, total }, courseOptions] = await Promise.all([
+    getStudentList({
+      search: search || undefined,
+      grade: gradeParam,
+      riskLevel: riskLevelParam,
+      course: courseParam,
+      page: pageParam,
+      limit: PAGE_SIZE,
+      viewerId: profile.userId,
+      viewerRole: profile.role,
+    }),
+    getCourseOptions(profile.userId, profile.role),
+  ]);
 
-interface StudentsPageProps {
-  searchParams: Promise<{
-    search?: string;
-    grade?: string;
-    atRisk?: string;
-  }>;
-}
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const currentPage = totalPages > 0 ? Math.min(pageParam, totalPages) : 1;
 
-export default async function StudentsPage({ searchParams }: StudentsPageProps) {
-  const profile = await requireStaffProfile();
-  const params = await searchParams;
-
-  const grade = params.grade ? parseInt(params.grade, 10) : undefined;
-  const atRisk = params.atRisk === "true" ? true : undefined;
-
-  const studentList = await getStudentList({
-    search: params.search,
-    grade: isNaN(grade ?? NaN) ? undefined : grade,
-    atRisk,
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
-    viewerId: profile.userId,
-    viewerRole: profile.role,
-  });
+  const startItem = total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const endItem = Math.min(currentPage * PAGE_SIZE, total);
 
   return (
-<<<<<<< HEAD
     <div className="flex flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Students</h1>
         <p className="text-sm text-muted-foreground">
-          {studentList.length} student{studentList.length !== 1 ? "s" : ""}
+          {total === 0
+            ? "No students found"
+            : `Showing ${startItem}\u2013${endItem} of ${total} student${total !== 1 ? "s" : ""}`}
         </p>
       </div>
 
@@ -80,7 +67,9 @@ export default async function StudentsPage({ searchParams }: StudentsPageProps) 
         <StudentFilters
           search={search}
           grade={params.grade ?? ""}
-          atRisk={params.atRisk ?? ""}
+          course={params.course ?? ""}
+          riskLevel={params.riskLevel ?? ""}
+          courseOptions={courseOptions}
         />
       </Suspense>
 
@@ -99,53 +88,13 @@ export default async function StudentsPage({ searchParams }: StudentsPageProps) 
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {studentList.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium">
-                    <Link
-                      href={`/students/${student.id}`}
-                      className="hover:underline"
-                    >
-                      {student.lastName}, {student.firstName}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{GRADE_LABEL[student.gradeLevel] ?? student.gradeLevel}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {student.counselorName ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    {student.isAtRisk ? (
-                      <Badge variant="destructive">At Risk</Badge>
-                    ) : (
-                      <Badge variant="secondary">On Track</Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            <StudentTableBody rows={studentList} />
           </Table>
+          <Suspense>
+            <PaginationControls currentPage={currentPage} totalPages={totalPages} />
+          </Suspense>
         </div>
       )}
-=======
-    <div className="flex flex-1 flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Students</h1>
-        <p className="text-sm text-muted-foreground">
-          {profile.role === "teacher"
-            ? "Students enrolled in your classes"
-            : "All active students"}
-        </p>
-      </div>
-
-      <SearchBar
-        defaultSearch={params.search ?? ""}
-        defaultGrade={params.grade ?? ""}
-        defaultAtRisk={params.atRisk ?? ""}
-      />
-
-      <StudentsTable students={studentList} />
->>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
     </div>
   );
 }

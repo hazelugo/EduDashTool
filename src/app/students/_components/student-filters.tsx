@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,11 +15,15 @@ import {
 export function StudentFilters({
   search,
   grade,
-  atRisk,
+  course,
+  riskLevel,
+  courseOptions,
 }: {
   search: string;
   grade: string;
-  atRisk: string;
+  course: string;
+  riskLevel: string;
+  courseOptions: string[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -32,22 +37,24 @@ export function StudentFilters({
     } else {
       params.delete(key);
     }
+    // Reset to page 1 when filters change
+    params.delete("page");
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`);
     });
   }
 
+  const debouncedSearch = useDebouncedCallback((val: string) => {
+    update("search", val);
+  }, 350);
+
   return (
     <div className="flex flex-wrap gap-3">
       <Input
-        placeholder="Search by name…"
+        placeholder="Search by name..."
         defaultValue={search}
         className="max-w-xs"
-        onChange={(e) => {
-          const val = e.target.value;
-          clearTimeout((window as unknown as Record<string, ReturnType<typeof setTimeout>>)["_studentSearchTimer"]);
-          (window as unknown as Record<string, ReturnType<typeof setTimeout>>)["_studentSearchTimer"] = setTimeout(() => update("search", val), 350);
-        }}
+        onChange={(e) => debouncedSearch(e.target.value)}
       />
 
       <Select
@@ -67,16 +74,34 @@ export function StudentFilters({
       </Select>
 
       <Select
-        defaultValue={atRisk || "all"}
-        onValueChange={(val) => update("atRisk", val ?? "")}
+        defaultValue={course || "all"}
+        onValueChange={(val) => update("course", val ?? "")}
+      >
+        <SelectTrigger className="w-44">
+          <SelectValue placeholder="Course" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All courses</SelectItem>
+          {courseOptions.map((name) => (
+            <SelectItem key={name} value={name}>
+              {name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        defaultValue={riskLevel || "all"}
+        onValueChange={(val) => update("riskLevel", val ?? "")}
       >
         <SelectTrigger className="w-36">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All students</SelectItem>
-          <SelectItem value="true">At-risk only</SelectItem>
-          <SelectItem value="false">On track only</SelectItem>
+          <SelectItem value="at-risk">At Risk</SelectItem>
+          <SelectItem value="watch">Watch</SelectItem>
+          <SelectItem value="on-track">On Track</SelectItem>
         </SelectContent>
       </Select>
     </div>
