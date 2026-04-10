@@ -1,0 +1,30 @@
+# Libraries
+
+- `middleware.ts` — function middleware: (request) => void, const config
+- `src\app\api\health\route.ts` — function GET: () => void
+- `src\hooks\use-mobile.ts` — function useIsMobile: () => void
+- `src\lib\audit.ts` — function logAuditEntry: (viewerId, studentId) => Promise<void>
+- `src\lib\auth.ts`
+  - function requireUser: () => Promise<
+  - function requireStaffProfile: () => Promise<StaffProfile>
+  - type StaffProfile
+- `src\lib\dashboard.ts`
+  - function getAtRiskStudents: () => Promise<AtRiskStudent[]>
+  - function getSchoolStats: (atRiskCount) => Promise<SchoolStats>
+  - function getAttendanceTrend: () => Promise<AttendanceDataPoint[]>
+  - function getGradeDistribution: () => Promise<GradeDistPoint[]>
+  - type SchoolStats
+  - type AtRiskStudent
+  - _...2 more_
+- `src\lib\students.ts`
+  - function deriveRiskLevel: (onTrack) => RiskLevel
+  - function getStudentList: (params) => Promise<StudentListResult>
+  - function getCourseOptions: (viewerId, viewerRole) => Promise<string[]>
+  - function getStudentById: (studentId) => Promise<StudentDetail | null>
+  - function getStudentGradesByClass: (studentId) => Promise<ClassWithGrades[]>
+  - function getStudentAttendance: (studentId) => Promise<StudentAttendanceStats>
+  - _...16 more_
+- `src\lib\supabase\client.ts` — function createClient: () => void
+- `src\lib\supabase\server.ts` — function createClient: () => void
+- `src\lib\utils.ts` — function cn: (...inputs) => void
+- `src\middleware.ts` — function proxy: (request) => void, const config
