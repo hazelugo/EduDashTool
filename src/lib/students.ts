@@ -22,7 +22,12 @@ import {
   gte,
   inArray,
   desc,
+  isNull,
 } from "drizzle-orm";
+
+export const PAGE_SIZE = 25;
+
+export type RiskLevel = "at-risk" | "watch" | "on-track";
 
 export type StudentRow = {
   id: string;
@@ -30,7 +35,12 @@ export type StudentRow = {
   lastName: string;
   gradeLevel: number;
   counselorName: string | null;
-  isAtRisk: boolean;
+  riskLevel: RiskLevel;
+};
+
+export type StudentListResult = {
+  rows: StudentRow[];
+  total: number;
 };
 
 export type StudentDetail = {
@@ -40,8 +50,14 @@ export type StudentDetail = {
   gradeLevel: number;
   counselorName: string | null;
   enrolledAt: string | null;
-  isAtRisk: boolean;
+  riskLevel: RiskLevel;
 };
+
+export function deriveRiskLevel(onTrack: boolean | null): RiskLevel {
+  if (onTrack === false) return "at-risk";
+  if (onTrack === true) return "on-track";
+  return "watch";
+}
 
 export type GradeEntry = {
   id: string;
@@ -98,13 +114,19 @@ export type CollegePrepData = {
 export type GetStudentListParams = {
   search?: string;
   grade?: number;
-  atRisk?: boolean;
+  riskLevel?: RiskLevel;
+  course?: string;
+  page?: number;
+  limit?: number;
   viewerId: string;
   viewerRole: "principal" | "counselor" | "teacher";
 };
 
-export async function getStudentList(params: GetStudentListParams): Promise<StudentRow[]> {
-  const { search, grade, atRisk, viewerId, viewerRole } = params;
+export async function getStudentList(params: GetStudentListParams): Promise<StudentListResult> {
+  const { search, grade, riskLevel, course, viewerId, viewerRole } = params;
+  const page = params.page ?? 1;
+  const limit = params.limit ?? PAGE_SIZE;
+  const offset = (page - 1) * limit;
 
   // Role scoping: teachers can only see students in their classes
   let allowedIds: string[] | null = null;
@@ -115,16 +137,16 @@ export async function getStudentList(params: GetStudentListParams): Promise<Stud
       .innerJoin(classes, eq(classes.id, enrollments.classId))
       .where(eq(classes.teacherId, viewerId));
     allowedIds = rows.map((r) => r.studentId);
-    if (allowedIds.length === 0) return [];
+    if (allowedIds.length === 0) return { rows: [], total: 0 };
   }
 
   const conditions = [eq(students.isActive, true)];
 
-  if (viewerRole === "counselor") {
-    conditions.push(eq(students.counselorId, viewerId));
-  } else if (allowedIds !== null) {
+  if (allowedIds !== null) {
+    // Teacher: only their enrolled students
     conditions.push(inArray(students.id, allowedIds));
   }
+  // Counselor and principal: no additional scoping — see all active students
 
   if (grade !== undefined) {
     conditions.push(eq(students.gradeLevel, grade));
@@ -137,35 +159,85 @@ export async function getStudentList(params: GetStudentListParams): Promise<Stud
     );
   }
 
-  const rows = await db
-    .select({
-      id: students.id,
-      firstName: students.firstName,
-      lastName: students.lastName,
-      gradeLevel: students.gradeLevel,
-      counselorName: staffProfiles.fullName,
-      onTrack: graduationPlans.onTrack,
-    })
-    .from(students)
-    .leftJoin(staffProfiles, eq(students.counselorId, staffProfiles.id))
-    .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
-    .where(and(...conditions))
-    .orderBy(students.lastName, students.firstName);
+  // Risk level filter applied at SQL level (not post-query) using graduationPlans.onTrack
+  if (riskLevel === "at-risk") {
+    conditions.push(eq(graduationPlans.onTrack, false));
+  } else if (riskLevel === "on-track") {
+    conditions.push(eq(graduationPlans.onTrack, true));
+  } else if (riskLevel === "watch") {
+    conditions.push(isNull(graduationPlans.onTrack));
+  }
 
-  const result: StudentRow[] = rows.map((r) => ({
+  // Course filter: find students enrolled in any section of that course
+  if (course) {
+    const enrolledInCourse = await db
+      .selectDistinct({ studentId: enrollments.studentId })
+      .from(enrollments)
+      .innerJoin(classes, eq(classes.id, enrollments.classId))
+      .where(eq(classes.courseName, course));
+    const courseStudentIds = enrolledInCourse.map((r) => r.studentId);
+    if (courseStudentIds.length === 0) return { rows: [], total: 0 };
+    conditions.push(inArray(students.id, courseStudentIds));
+  }
+
+  const whereClause = and(...conditions);
+
+  const [dataRows, countResult] = await Promise.all([
+    db
+      .select({
+        id: students.id,
+        firstName: students.firstName,
+        lastName: students.lastName,
+        gradeLevel: students.gradeLevel,
+        counselorName: staffProfiles.fullName,
+        onTrack: graduationPlans.onTrack,
+      })
+      .from(students)
+      .leftJoin(staffProfiles, eq(students.counselorId, staffProfiles.id))
+      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
+      .where(whereClause)
+      .orderBy(students.lastName, students.firstName)
+      .limit(limit)
+      .offset(offset),
+    db
+      .select({ total: count() })
+      .from(students)
+      .leftJoin(graduationPlans, eq(graduationPlans.studentId, students.id))
+      .where(whereClause),
+  ]);
+
+  const total = countResult[0]?.total ?? 0;
+
+  const rows: StudentRow[] = dataRows.map((r) => ({
     id: r.id,
     firstName: r.firstName,
     lastName: r.lastName,
     gradeLevel: r.gradeLevel,
     counselorName: r.counselorName ?? null,
-    isAtRisk: r.onTrack === false,
+    riskLevel: deriveRiskLevel(r.onTrack ?? null),
   }));
 
-  if (atRisk !== undefined) {
-    return result.filter((s) => s.isAtRisk === atRisk);
-  }
+  return { rows, total };
+}
 
-  return result;
+export async function getCourseOptions(
+  viewerId: string,
+  viewerRole: "principal" | "counselor" | "teacher"
+): Promise<string[]> {
+  if (viewerRole === "teacher") {
+    const rows = await db
+      .selectDistinct({ courseName: classes.courseName })
+      .from(classes)
+      .where(eq(classes.teacherId, viewerId))
+      .orderBy(classes.courseName);
+    return rows.map((r) => r.courseName);
+  }
+  // Counselor and principal see all courses
+  const rows = await db
+    .selectDistinct({ courseName: classes.courseName })
+    .from(classes)
+    .orderBy(classes.courseName);
+  return rows.map((r) => r.courseName);
 }
 
 export async function getStudentById(studentId: string): Promise<StudentDetail | null> {
@@ -195,7 +267,7 @@ export async function getStudentById(studentId: string): Promise<StudentDetail |
     gradeLevel: r.gradeLevel,
     counselorName: r.counselorName ?? null,
     enrolledAt: r.enrolledAt ?? null,
-    isAtRisk: r.onTrack === false,
+    riskLevel: deriveRiskLevel(r.onTrack ?? null),
   };
 }
 
