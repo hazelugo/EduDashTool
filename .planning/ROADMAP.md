@@ -63,7 +63,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Wave 0 tests + backend query fixes (pagination, counselor bug, risk level, course filter)
-- [ ] 03-02-PLAN.md — StudentFilters: debounce fix, course dropdown, 3-level risk select
+- [x] 03-02-PLAN.md — StudentFilters: debounce fix, course dropdown, 3-level risk select
 - [ ] 03-03-PLAN.md — Students page: pagination controls, StudentTableBody, 3-level badge
 
 ### Phase 4: Student Profile — Read
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation and Schema | 5/5 | Complete   | 2026-03-15 |
 | 2. Role System and Staff Profiles | 3/3 | Complete    | 2026-03-16 |
-| 3. Student List and Search | 1/3 | In Progress|  |
+| 3. Student List and Search | 2/3 | In Progress|  |
 | 4. Student Profile — Read | 0/TBD | Not started | - |
 | 5. Data Entry — Write | 0/TBD | Not started | - |
 | 6. Gemini AI Integration | 0/TBD | Not started | - |
