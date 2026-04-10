@@ -24,11 +24,11 @@
 
 ### Student List
 
-- [ ] **LIST-01**: User can view a paginated list of students scoped to their role (teacher sees own students, counselor/principal sees all)
-- [ ] **LIST-02**: User can search students by name
-- [ ] **LIST-03**: User can filter the student list by grade level
-- [ ] **LIST-04**: User can filter the student list by class/course
-- [ ] **LIST-05**: User can filter the student list by Gemini-generated risk level (at-risk, watch, on-track)
+- [x] **LIST-01**: User can view a paginated list of students scoped to their role (teacher sees own students, counselor/principal sees all)
+- [x] **LIST-02**: User can search students by name
+- [x] **LIST-03**: User can filter the student list by grade level
+- [x] **LIST-04**: User can filter the student list by class/course
+- [x] **LIST-05**: User can filter the student list by Gemini-generated risk level (at-risk, watch, on-track)
 
 ### Student Profile
 
@@ -116,11 +116,11 @@
 | AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Complete |
 | AUTH-06 | Phase 2 | Complete |
-| LIST-01 | Phase 3 | Pending |
-| LIST-02 | Phase 3 | Pending |
-| LIST-03 | Phase 3 | Pending |
-| LIST-04 | Phase 3 | Pending |
-| LIST-05 | Phase 3 | Pending |
+| LIST-01 | Phase 3 | Complete |
+| LIST-02 | Phase 3 | Complete |
+| LIST-03 | Phase 3 | Complete |
+| LIST-04 | Phase 3 | Complete |
+| LIST-05 | Phase 3 | Complete |
 | PROF-01 | Phase 4 | Pending |
 | PROF-02 | Phase 4 | Pending |
 | PROF-03 | Phase 4 | Pending |

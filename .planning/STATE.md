@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-16T09:50:58.063Z"
-last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
+status: Ready to execute
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-10T23:17:34.429Z"
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
-  percent: 40
+  total_plans: 11
+  completed_plans: 9
 ---
 
 # Project State
@@ -21,20 +19,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Click a student, see everything — no more tab-switching between disconnected tools.
-**Current focus:** Phase 1 — Foundation and Schema
+**Current focus:** Phase 03 — student-list-and-search
 
 ## Current Position
 
-Phase: 1 of 7 (Foundation and Schema)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
-
-Progress: [████░░░░░░] 40%
+Phase: 03 (student-list-and-search) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: —
 - Total execution time: 0 hours
@@ -46,6 +41,7 @@ Progress: [████░░░░░░] 40%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: —
 - Trend: —
 
@@ -57,6 +53,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01-foundation-and-schema P05 | 8 | 2 tasks | 6 files |
 | Phase 02-role-system-and-staff-profiles P02 | 12 | 2 tasks | 5 files |
 | Phase 02-role-system-and-staff-profiles P01 | 25 | 2 tasks | 7 files |
+| Phase 03-student-list-and-search P01 | 12 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -86,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 02-role-system-and-staff-profiles]: vitest installed with loadEnv config to pick up .env.local — required since supabase/server.ts throws at module level without NEXT_PUBLIC_SUPABASE_URL
 - [Phase 02-role-system-and-staff-profiles]: roleLabel mapping defined inside component function body — co-located with usage for clarity
 - [Phase 02-role-system-and-staff-profiles]: Audit log page uses simple leftJoin query (no CTE) — simpler and sufficient for 200-entry limit
+- [Phase 03-student-list-and-search]: Risk level filter applied at SQL level (not post-query) using graduationPlans.onTrack — ensures accurate pagination totals
+- [Phase 03-student-list-and-search]: Counselor scoping bug fixed: counselors no longer restricted to counselorId match; see all active students like principals
+- [Phase 03-student-list-and-search]: deriveRiskLevel exported as pure function for testability; maps onTrack boolean/null to RiskLevel string enum
 
 ### Pending Todos
 
@@ -99,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T09:35:04.138Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-10T23:17:34.425Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
