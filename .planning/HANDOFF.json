@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-10T23:43:01.413Z",
+  "phase": "03",
+  "phase_name": "student-list-and-search",
+  "phase_dir": ".planning/phases/03-student-list-and-search",
+  "plan": 3,
+  "task": 0,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "03-01", "name": "Backend fixes, pagination, risk level derivation, test scaffold", "status": "done", "commit": "01baa0d"},
+    {"id": "03-02", "name": "StudentFilters rewrite — debounce fix, course dropdown, 3-level risk select", "status": "done", "commit": "4850fd3"}
+  ],
+  "remaining_tasks": [
+    {"id": "03-03", "name": "Server component wiring + pagination UI + StudentTableBody + PaginationControls", "status": "not_started"}
+  ],
+  "blockers": [
+    {
+      "description": "STATE.md has an unresolved git merge conflict (<<<<<<< HEAD vs 40a24da). Must be resolved before gsd-tools can parse it reliably.",
+      "type": "technical",
+      "workaround": "Resolve the conflict: keep the HEAD block (Phase 03, 10 completed plans). The other branch (40a24da) reflects stale state from March."
+    }
+  ],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Fixed counselor scoping bug by removing eq(students.counselorId, viewerId) for counselor role", "rationale": "Counselors should see all students, not just their own", "phase": "03"},
+    {"decision": "Risk level filter moved to SQL (not post-query) using onTrack boolean and isNull", "rationale": "Performance — avoids fetching all rows then filtering in JS", "phase": "03"},
+    {"decision": "Used useDebouncedCallback from use-debounce (already installed) instead of window timer hack", "rationale": "SSR-safe, idiomatic, avoids the D-17 bug", "phase": "03"},
+    {"decision": "GSD updated from v1.28.0 to v1.34.2 mid-session", "rationale": "User ran /gsd-update", "phase": "03"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Execute plan 03-03: update src/app/students/page.tsx (server component), create src/app/students/_components/student-table-body.tsx, create src/app/students/_components/pagination-controls.tsx. Resolve STATE.md merge conflict first.",
+  "context_notes": "Wave 1 and Wave 2 of Phase 03 are complete with commits. Wave 3 (03-03) was interrupted by user mid-spawn when they asked to run codesight commands and then /gsd-update. The worktree agent for 03-02 may have left a branch (worktree-agent-ad2ec1e1) — check git branch -a."
+}
