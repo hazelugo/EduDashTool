@@ -2,6 +2,7 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+<<<<<<< HEAD
 status: Ready to execute
 stopped_at: Completed 03-02-PLAN.md
 last_updated: "2026-04-10T23:22:54.380Z"
@@ -10,6 +11,18 @@ progress:
   completed_phases: 2
   total_plans: 11
   completed_plans: 10
+=======
+status: planning
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-16T09:50:58.063Z"
+last_activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
+progress:
+  total_phases: 7
+  completed_phases: 2
+  total_plans: 8
+  completed_plans: 8
+  percent: 40
+>>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
 ---
 
 # Project State
@@ -19,16 +32,35 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Click a student, see everything — no more tab-switching between disconnected tools.
+<<<<<<< HEAD
 **Current focus:** Phase 03 — student-list-and-search
 
 ## Current Position
 
 Phase: 03 (student-list-and-search) — EXECUTING
 Plan: 3 of 3
+=======
+**Current focus:** Phase 1 — Foundation and Schema
+
+## Current Position
+
+Phase: 1 of 7 (Foundation and Schema)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-15 — Roadmap created, 34 requirements mapped across 7 phases
+
+Progress: [████░░░░░░] 40%
+
+> > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 ## Performance Metrics
 
 **Velocity:**
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 - Total plans completed: 0
 - Average duration: —
@@ -37,15 +69,20 @@ Plan: 3 of 3
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+| ----- | ----- | ----- | -------- |
+| -     | -     | -     | -        |
 
 **Recent Trend:**
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 - Last 5 plans: —
 - Trend: —
 
-*Updated after each plan completion*
+_Updated after each plan completion_
 | Phase 01-foundation-and-schema P03 | 1 | 2 tasks | 3 files |
 | Phase 01-foundation-and-schema P01 | 1 | 2 tasks | 2 files |
 | Phase 01-foundation-and-schema P02 | 2 | 2 tasks | 6 files |
@@ -53,8 +90,12 @@ Plan: 3 of 3
 | Phase 01-foundation-and-schema P05 | 8 | 2 tasks | 6 files |
 | Phase 02-role-system-and-staff-profiles P02 | 12 | 2 tasks | 5 files |
 | Phase 02-role-system-and-staff-profiles P01 | 25 | 2 tasks | 7 files |
+<<<<<<< HEAD
 | Phase 03-student-list-and-search P01 | 12 | 2 tasks | 2 files |
 | Phase 03-student-list-and-search P02 | 8 | 1 tasks | 1 files |
+=======
+
+> > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 ## Accumulated Context
 
@@ -84,12 +125,14 @@ Recent decisions affecting current work:
 - [Phase 02-role-system-and-staff-profiles]: vitest installed with loadEnv config to pick up .env.local — required since supabase/server.ts throws at module level without NEXT_PUBLIC_SUPABASE_URL
 - [Phase 02-role-system-and-staff-profiles]: roleLabel mapping defined inside component function body — co-located with usage for clarity
 - [Phase 02-role-system-and-staff-profiles]: Audit log page uses simple leftJoin query (no CTE) — simpler and sufficient for 200-entry limit
+  <<<<<<< HEAD
 - [Phase 03-student-list-and-search]: Risk level filter applied at SQL level (not post-query) using graduationPlans.onTrack — ensures accurate pagination totals
 - [Phase 03-student-list-and-search]: Counselor scoping bug fixed: counselors no longer restricted to counselorId match; see all active students like principals
 - [Phase 03-student-list-and-search]: deriveRiskLevel exported as pure function for testability; maps onTrack boolean/null to RiskLevel string enum
 - [Phase 03-student-list-and-search]: useDebouncedCallback from use-debounce replaces window timer hack in StudentFilters — SSR-safe
 - [Phase 03-student-list-and-search]: courseOptions passed as prop from server component — keeps StudentFilters client component stateless
-- [Phase 03-student-list-and-search]: riskLevel prop replaces atRisk in StudentFilters — aligns with 3-level RiskLevel type from Plan 01
+- # [Phase 03-student-list-and-search]: riskLevel prop replaces atRisk in StudentFilters — aligns with 3-level RiskLevel type from Plan 01
+  > > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
 
 ### Pending Todos
 
@@ -103,6 +146,12 @@ None yet.
 
 ## Session Continuity
 
+<<<<<<< HEAD
 Last session: 2026-04-10T23:22:54.375Z
 Stopped at: Completed 03-02-PLAN.md
-Resume file: None
+=======
+Last session: 2026-03-16T09:35:04.138Z
+Stopped at: Completed 02-01-PLAN.md
+
+> > > > > > > 40a24da0522a5497431bc3fe31385f48c0c62d1f
+> > > > > > > Resume file: None

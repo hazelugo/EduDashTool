@@ -10,7 +10,11 @@ interface ErrorProps {
 
 export default function StudentsError({ error, reset }: ErrorProps) {
   useEffect(() => {
+<<<<<<< HEAD
     console.error("Students error:", error);
+=======
+    console.error("Students page error:", error);
+>>>>>>> 40a24da0522a5497431bc3fe31385f48c0c62d1f
   }, [error]);
 
   return (
