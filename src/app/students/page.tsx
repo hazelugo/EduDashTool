@@ -27,7 +27,9 @@ export default async function StudentsPage({
   const params = await searchParams;
 
   const search = params.search ?? "";
-  const gradeParam = params.grade ? Number(params.grade) : undefined;
+  const gradeRaw = params.grade !== undefined ? Number(params.grade) : undefined;
+  const gradeParam =
+    gradeRaw !== undefined && Number.isFinite(gradeRaw) ? gradeRaw : undefined;
   const riskLevelParam = (params.riskLevel as RiskLevel) || undefined;
   const courseParam = params.course || undefined;
   const pageParam = params.page ? Math.max(1, Number(params.page)) : 1;
