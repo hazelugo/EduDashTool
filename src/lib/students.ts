@@ -23,6 +23,7 @@ import {
   inArray,
   desc,
   isNull,
+  isNotNull,
 } from "drizzle-orm";
 
 export const PAGE_SIZE = 25;
@@ -165,7 +166,12 @@ export async function getStudentList(params: GetStudentListParams): Promise<Stud
   } else if (riskLevel === "on-track") {
     conditions.push(eq(graduationPlans.onTrack, true));
   } else if (riskLevel === "watch") {
-    conditions.push(isNull(graduationPlans.onTrack));
+    conditions.push(
+      and(
+        isNotNull(graduationPlans.id),   // plan row exists
+        isNull(graduationPlans.onTrack)  // but on_track is null
+      )!
+    );
   }
 
   // Course filter: find students enrolled in any section of that course
