@@ -1,35 +1,35 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-10T23:43:01.413Z",
+  "timestamp": "2026-04-11T06:12:44.345Z",
   "phase": "03",
   "phase_name": "student-list-and-search",
   "phase_dir": ".planning/phases/03-student-list-and-search",
   "plan": 3,
-  "task": 0,
-  "total_tasks": 2,
+  "task": null,
+  "total_tasks": null,
   "status": "paused",
   "completed_tasks": [
-    {"id": "03-01", "name": "Backend fixes, pagination, risk level derivation, test scaffold", "status": "done", "commit": "01baa0d"},
-    {"id": "03-02", "name": "StudentFilters rewrite — debounce fix, course dropdown, 3-level risk select", "status": "done", "commit": "4850fd3"}
+    {"id": "review-1", "name": "Code review phase 03 (8 files, 7 findings)", "status": "done", "commit": "586ed3d"},
+    {"id": "fix-WR-01", "name": "Fix WR-01: NaN grade filter (Number.isFinite)", "status": "done", "commit": "a247c7d"},
+    {"id": "fix-WR-02", "name": "Fix WR-02: watch filter excludes plan-less students (isNotNull)", "status": "done", "commit": "32beaf2"},
+    {"id": "fix-WR-03", "name": "Fix WR-03: key={search} on Input forces remount on nav", "status": "done", "commit": "7c2b5fc"},
+    {"id": "fix-WR-04", "name": "Fix WR-04: fail-fast throw when DB connection string missing", "status": "done", "commit": "8f1ec95"},
+    {"id": "fix-IN-01", "name": "Fix IN-01: runtime riskLevel validation allowlist", "status": "done", "commit": "288e663"},
+    {"id": "fix-IN-02", "name": "Fix IN-02: guard console.error to non-production", "status": "done", "commit": "7332fb6"},
+    {"id": "fix-IN-03", "name": "Fix IN-03: add role-scoping + course-filter unit tests", "status": "done", "commit": "6eb2ee9"},
+    {"id": "docs-fix-report", "name": "Commit REVIEW-FIX.md (all fixes, status: all_fixed)", "status": "done", "commit": "b66546b"}
   ],
   "remaining_tasks": [
-    {"id": "03-03", "name": "Server component wiring + pagination UI + StudentTableBody + PaginationControls", "status": "not_started"}
+    {"id": "pre-04-1", "name": "Fix student.isAtRisk → riskLevel in src/app/students/[id]/page.tsx", "status": "not_started"},
+    {"id": "phase-04", "name": "Plan and execute Phase 04: Student Profile — Read", "status": "not_started"}
   ],
-  "blockers": [
-    {
-      "description": "STATE.md has an unresolved git merge conflict (<<<<<<< HEAD vs 40a24da). Must be resolved before gsd-tools can parse it reliably.",
-      "type": "technical",
-      "workaround": "Resolve the conflict: keep the HEAD block (Phase 03, 10 completed plans). The other branch (40a24da) reflects stale state from March."
-    }
-  ],
+  "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Fixed counselor scoping bug by removing eq(students.counselorId, viewerId) for counselor role", "rationale": "Counselors should see all students, not just their own", "phase": "03"},
-    {"decision": "Risk level filter moved to SQL (not post-query) using onTrack boolean and isNull", "rationale": "Performance — avoids fetching all rows then filtering in JS", "phase": "03"},
-    {"decision": "Used useDebouncedCallback from use-debounce (already installed) instead of window timer hack", "rationale": "SSR-safe, idiomatic, avoids the D-17 bug", "phase": "03"},
-    {"decision": "GSD updated from v1.28.0 to v1.34.2 mid-session", "rationale": "User ran /gsd-update", "phase": "03"}
+    {"decision": "WR-02 fix uses and(isNotNull(graduationPlans.id), isNull(graduationPlans.onTrack))", "rationale": "LEFT JOIN returns all-null for students with no plan row; isNotNull on id is required to exclude them from the watch bucket", "phase": "03"},
+    {"decision": "IN-03 tests use makeQueryMock helper for chainable Drizzle-style builder", "rationale": "Drizzle queries are thenable, chainable objects — mock must support .from().where().leftJoin() chaining", "phase": "03"}
   ],
-  "uncommitted_files": [],
-  "next_action": "Execute plan 03-03: update src/app/students/page.tsx (server component), create src/app/students/_components/student-table-body.tsx, create src/app/students/_components/pagination-controls.tsx. Resolve STATE.md merge conflict first.",
-  "context_notes": "Wave 1 and Wave 2 of Phase 03 are complete with commits. Wave 3 (03-03) was interrupted by user mid-spawn when they asked to run codesight commands and then /gsd-update. The worktree agent for 03-02 may have left a branch (worktree-agent-ad2ec1e1) — check git branch -a."
+  "uncommitted_files": ["tsconfig.tsbuildinfo"],
+  "next_action": "Fix src/app/students/[id]/page.tsx: replace student.isAtRisk with student.riskLevel (or deriveRiskLevel result). Then run /gsd-plan-phase 04.",
+  "context_notes": "Phase 03 is fully complete. Code review ran on 8 files, found 7 issues (0 critical, 4 warning, 3 info), all 7 fixed and committed atomically this session. tsconfig.tsbuildinfo is modified but is a build artifact — do not commit. Phase 04 (Student Profile — Read) is next. The only pre-work is the isAtRisk → riskLevel rename in students/[id]/page.tsx (pending todo in STATE.md)."
 }
