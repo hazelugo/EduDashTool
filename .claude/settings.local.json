@@ -23,7 +23,17 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Skill(gsd:plan-phase)",
-      "Bash(npx codesight:*)"
+      "Bash(npx codesight:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git -C \"C:/Users/Hector/Documents/EduDashTool\" rev-parse HEAD)",
+      "Bash(git -C \"C:/Users/Hector/Documents/EduDashTool\" branch --show-current)",
+      "Bash(git -C \"C:/Users/Hector/Documents/EduDashTool\" diff 6d8277f HEAD -- src/lib/students.ts)",
+      "Bash(git -C \"C:/Users/Hector/Documents/EduDashTool\" worktree remove \"C:/Users/Hector/Documents/EduDashTool/.claude/worktrees/agent-ac38a747\" --force)",
+      "Bash(git -C \"C:/Users/Hector/Documents/EduDashTool\" branch -D worktree-agent-ac38a747)",
+      "Skill(gsd-code-review)",
+      "Bash(claude:*)",
+      "Bash(npm update:*)"
     ]
   }
 }

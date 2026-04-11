@@ -65,7 +65,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Wave 0 tests + backend query fixes (pagination, counselor bug, risk level, course filter)
 - [x] 03-02-PLAN.md — StudentFilters: debounce fix, course dropdown, 3-level risk select
-- [ ] 03-03-PLAN.md — Students page: pagination controls, StudentTableBody, 3-level badge
+- [x] 03-03-PLAN.md — Students page: pagination controls, StudentTableBody, 3-level badge
 
 ### Phase 4: Student Profile — Read
 **Goal**: Clicking any student opens a single page that displays their complete academic picture with no missing panels or broken layouts
