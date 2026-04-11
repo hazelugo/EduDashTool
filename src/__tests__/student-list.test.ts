@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // LIST-01: Counselor and principal see all active students
 // LIST-02: Teacher sees only students enrolled in their classes
@@ -127,5 +127,112 @@ describe("GetStudentListParams type shape", () => {
     expect(params.limit).toBe(25);
     expect(params.course).toBe("Algebra");
     expect(params.riskLevel).toBe("at-risk");
+  });
+});
+
+// ─── Role-scoping logic tests ─────────────────────────────────────────────────
+
+// Build a chainable query builder mock that resolves to a given value at .where()
+function makeQueryMock(resolveValue: unknown[]) {
+  const chain: Record<string, unknown> = {};
+  const methods = [
+    "select",
+    "selectDistinct",
+    "from",
+    "innerJoin",
+    "leftJoin",
+    "where",
+    "orderBy",
+    "limit",
+    "offset",
+  ];
+  for (const m of methods) {
+    chain[m] = vi.fn(() => chain);
+  }
+  // Terminal awaitable: .where() returns a Promise when the chain is awaited
+  (chain.where as ReturnType<typeof vi.fn>).mockResolvedValue(resolveValue);
+  // Also make the chain itself thenable for patterns that await without .where()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (chain as any).then = (
+    onfulfilled?: ((value: unknown[]) => unknown) | null,
+    onrejected?: ((reason: unknown) => unknown) | null
+  ) => Promise.resolve(resolveValue).then(onfulfilled, onrejected);
+  return chain;
+}
+
+describe("getStudentList role-scoping", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns empty immediately for a teacher with no enrolled students", async () => {
+    // Mock db.selectDistinct(...).from(...).innerJoin(...).where(...) → []
+    const enrollmentChain = makeQueryMock([]);
+
+    vi.doMock("@/db", () => ({
+      db: {
+        selectDistinct: vi.fn(() => enrollmentChain),
+        select: vi.fn(() => enrollmentChain),
+      },
+    }));
+
+    const { getStudentList } = await import("../lib/students");
+    const result = await getStudentList({ viewerId: "teacher-1", viewerRole: "teacher" });
+    expect(result).toEqual({ rows: [], total: 0 });
+  });
+
+  it("returns empty immediately when course filter matches no students", async () => {
+    // For counselor: first db call (course enrollment lookup) returns []
+    // The function should short-circuit and return { rows: [], total: 0 }
+    const emptyChain = makeQueryMock([]);
+    const countChain = makeQueryMock([{ total: 0 }]);
+    let callCount = 0;
+
+    vi.doMock("@/db", () => ({
+      db: {
+        select: vi.fn(() => {
+          callCount = callCount + 1;
+          // First select call is the course enrollment lookup
+          return callCount === 1 ? emptyChain : countChain;
+        }),
+        selectDistinct: vi.fn(() => emptyChain),
+      },
+    }));
+
+    const { getStudentList } = await import("../lib/students");
+    const result = await getStudentList({
+      viewerId: "counselor-1",
+      viewerRole: "counselor",
+      course: "Algebra",
+    });
+    expect(result).toEqual({ rows: [], total: 0 });
+  });
+
+  it("does not apply inArray restriction for counselor role", async () => {
+    // For counselor: selectDistinct for teacher scoping should NOT be called
+    const selectDistinctMock = vi.fn();
+    const dataChain = makeQueryMock([]);
+    const countChain = makeQueryMock([{ total: 0 }]);
+    let selectCallCount = 0;
+
+    vi.doMock("@/db", () => ({
+      db: {
+        selectDistinct: selectDistinctMock,
+        select: vi.fn(() => {
+          selectCallCount = selectCallCount + 1;
+          return selectCallCount % 2 === 1 ? dataChain : countChain;
+        }),
+      },
+    }));
+
+    const { getStudentList } = await import("../lib/students");
+    await getStudentList({ viewerId: "counselor-1", viewerRole: "counselor" });
+
+    // selectDistinct is only used for teacher scoping; counselor path must not call it
+    expect(selectDistinctMock).not.toHaveBeenCalled();
   });
 });
