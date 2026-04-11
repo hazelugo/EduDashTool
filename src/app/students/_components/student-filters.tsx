@@ -51,6 +51,7 @@ export function StudentFilters({
   return (
     <div className="flex flex-wrap gap-3">
       <Input
+        key={search}
         placeholder="Search by name..."
         defaultValue={search}
         className="max-w-xs"
