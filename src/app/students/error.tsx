@@ -10,7 +10,10 @@ interface ErrorProps {
 
 export default function StudentsError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error("Students error:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Students error:", error);
+    }
+    // In production, rely on error.digest for server-side error correlation
   }, [error]);
 
   return (
